@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "366583602195",
+    "project_id": "maribermusik-752",
+    "storage_bucket": "maribermusik-752.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:366583602195:android:7bd5c93a5dee5edc55f3e6",
+        "android_client_info": {
+          "package_name": "com.example.mari_bermusik"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6V4Qo9xVSIkC9Pdx1VITtU-Co0gHUg4c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
