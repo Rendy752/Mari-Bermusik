@@ -22,7 +22,7 @@ class HomeScreen extends StatelessWidget {
           children: [
             // Header
             Container(
-              height: 130, // Ubah tinggi header menjadi 120
+              height: 110, // Ubah tinggi header menjadi 120
               child: ClipPath(
                 clipper: HeaderClipper(),
                 child: Container(
@@ -89,11 +89,11 @@ class HomeScreen extends StatelessWidget {
             // Gambar di tengah dengan rasio 9:16
             Container(
               width: double.infinity,
-              height: MediaQuery.of(context).size.width * 16 / 9,
+              height: 500,
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage('assets/images/guitar.jpg'),
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,
                 ),
               ),
             ),
