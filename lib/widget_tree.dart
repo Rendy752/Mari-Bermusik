@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mari_bermusik/pages/home.dart';
+import 'package:mari_bermusik/pages/material.dart';
 import 'package:mari_bermusik/pages/login_register.dart';
 import './auth.dart';
 
@@ -17,7 +17,7 @@ class _WidgetTreeState extends State<WidgetTree> {
       stream: Auth().authStateChanges,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return const HomePage();
+          return const MaterialScreen();
         } else {
           return LoginRegister();
         }

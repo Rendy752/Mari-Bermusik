@@ -1,7 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:mari_bermusik/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:mari_bermusik/component/custom_navigator_home_page.dart';
 import 'package:mari_bermusik/widget_tree.dart';
 import 'firebase_options.dart';
 // import 'package:mari_bermusik/firebase_options.dart';
@@ -29,7 +28,7 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.orange),
-      home: const WidgetTree(),
+      home: const CupertinoNavbar(),
     );
   }
 }

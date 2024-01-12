@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import '../auth.dart';
 import 'package:mari_bermusik/services/firestore.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class MaterialScreen extends StatefulWidget {
+  const MaterialScreen({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<MaterialScreen> createState() => _MaterialScreenState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _MaterialScreenState extends State<MaterialScreen> {
   final FirestoreServices firestoreServices = FirestoreServices();
   final TextEditingController title = TextEditingController();
   final TextEditingController instrument = TextEditingController();
@@ -76,11 +76,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _title() {
-    return const Text('Home Page');
+    return const Text('Material Page');
   }
 
   Widget _userId() {
-    return Text(user?.email ?? 'User email');
+    return Text(user?.email ?? 'Anonymous');
   }
 
   Widget _signOutButton() {

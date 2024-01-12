@@ -3,7 +3,7 @@ import 'package:mari_bermusik/auth.dart';
 import 'package:flutter/material.dart';
 
 class LoginRegister extends StatefulWidget {
-  LoginRegister({Key? key}) : super(key: key);
+  const LoginRegister({Key? key}) : super(key: key);
 
   @override
   State<LoginRegister> createState() => _LoginRegisterState();
@@ -43,7 +43,7 @@ class _LoginRegisterState extends State<LoginRegister> {
   }
 
   Widget _title() {
-    return const Text('Login');
+    return Text(isLogin ? 'Login' : 'Register');
   }
 
   Widget _entryField(
@@ -59,7 +59,10 @@ class _LoginRegisterState extends State<LoginRegister> {
   }
 
   Widget _errorMessage() {
-    return Text(errorMessage == '' ? '' : 'Error = $errorMessage');
+    return Text(
+      errorMessage == '' ? '' : '$errorMessage',
+      style: const TextStyle(color: Colors.red),
+    );
   }
 
   Widget _submitButton() {
@@ -71,13 +74,24 @@ class _LoginRegisterState extends State<LoginRegister> {
   }
 
   Widget _loginOrRegisterButton() {
-    return TextButton(
-      onPressed: () {
-        setState(() {
-          isLogin = !isLogin;
-        });
-      },
-      child: Text(isLogin ? 'Register instead' : 'Login instead'),
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(isLogin
+              ? 'Don\'t have an account ? '
+              : 'Already have an account ?'),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                isLogin = !isLogin;
+              });
+            },
+            child: Text(isLogin ? 'Register' : 'Login'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -95,8 +109,8 @@ class _LoginRegisterState extends State<LoginRegister> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            _entryField('email', _email),
-            _entryField('password', _password),
+            _entryField('Email', _email),
+            _entryField('Password', _password),
             _errorMessage(),
             _submitButton(),
             _loginOrRegisterButton(),
