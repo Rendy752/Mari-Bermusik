@@ -1,11 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import '../auth.dart';
 import 'package:mari_bermusik/services/firestore.dart';
 
 class MaterialScreen extends StatefulWidget {
-  const MaterialScreen({super.key});
+  const MaterialScreen({Key? key});
 
   @override
   State<MaterialScreen> createState() => _MaterialScreenState();
@@ -18,44 +18,41 @@ class _MaterialScreenState extends State<MaterialScreen> {
   final TextEditingController description = TextEditingController();
   final TextEditingController sub = TextEditingController();
   final TextEditingController content = TextEditingController();
+
   void openMaterialBox({String? id}) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         content: Column(
           children: [
-            const Text('Title'),
-            TextField(
-              controller: title,
-            ),
-            const Text('Instrument'),
-            TextField(
-              controller: instrument,
-            ),
-            const Text('Description'),
-            TextField(
-              controller: description,
-            ),
-            const Text('Sub'),
-            TextField(
-              controller: sub,
-            ),
-            const Text('Content'),
-            TextField(
-              controller: content,
-            ),
+            _buildTextField('Title', title),
+            _buildTextField('Instrument', instrument),
+            _buildTextField('Description', description),
+            _buildTextField('Sub', sub),
+            _buildTextField('Content', content),
           ],
         ),
         actions: [
           ElevatedButton(
             onPressed: () {
               if (id == null) {
-                firestoreServices.addMaterial(title.text, instrument.text,
-                    description.text, sub.text, content.text);
+                firestoreServices.addMaterial(
+                  title.text,
+                  instrument.text,
+                  description.text,
+                  sub.text,
+                  content.text,
+                );
                 title.clear();
               } else {
-                firestoreServices.updateMaterial(id, title.text,
-                    instrument.text, description.text, sub.text, content.text);
+                firestoreServices.updateMaterial(
+                  id,
+                  title.text,
+                  instrument.text,
+                  description.text,
+                  sub.text,
+                  content.text,
+                );
                 title.clear();
               }
               Navigator.pop(context);
@@ -64,7 +61,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
           )
         ],
         elevation: 24.0,
-        backgroundColor: Colors.deepOrange[300],
+        backgroundColor: Colors.deepOrange[100],
       ),
     );
   }
@@ -76,17 +73,36 @@ class _MaterialScreenState extends State<MaterialScreen> {
   }
 
   Widget _title() {
-    return const Text('Material Page');
+    return const Text(
+      'Material Page',
+      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+    );
   }
 
   Widget _userId() {
-    return Text(user?.email ?? 'Anonymous');
+    return Text(
+      user?.email ?? 'Anonymous',
+      style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+    );
   }
 
   Widget _signOutButton() {
     return ElevatedButton(
       onPressed: signOut,
       child: const Text('Sign Out'),
+    );
+  }
+
+  Widget _buildTextField(String label, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(),
+        ),
+      ),
     );
   }
 
@@ -101,12 +117,14 @@ class _MaterialScreenState extends State<MaterialScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: openMaterialBox,
+        onPressed: () => openMaterialBox(),
         child: const Icon(Icons.add),
       ),
-      body: Container(
-        height: double.infinity,
-        width: double.infinity,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      bottomNavigationBar: Container(
+        height: 70.0,
+      ),
+      body: Padding(
         padding: const EdgeInsets.all(20),
         child: StreamBuilder<QuerySnapshot>(
           stream: firestoreServices.getMaterials(),
@@ -114,50 +132,77 @@ class _MaterialScreenState extends State<MaterialScreen> {
             if (snapshots.hasData) {
               List listMaterials = snapshots.data!.docs;
               return ListView.builder(
-                  itemCount: listMaterials.length,
-                  itemBuilder: (context, index) {
-                    DocumentSnapshot document = listMaterials[index];
-                    String id = document.id;
+                itemCount: listMaterials.length,
+                itemBuilder: (context, index) {
+                  DocumentSnapshot document = listMaterials[index];
+                  String id = document.id;
 
-                    Map<String, dynamic> data =
-                        document.data() as Map<String, dynamic>;
-                    String title = data['title'];
-                    String instrument = data['instrument'];
-                    String description = data['description'];
-                    String sub = data['sub'];
-                    String content = data['content'];
+                  Map<String, dynamic> data =
+                      document.data() as Map<String, dynamic>;
+                  String title = data['title'];
+                  String instrument = data['instrument'];
+                  String description = data['description'];
+                  String sub = data['sub'];
+                  String content = data['content'];
 
-                    return Column(
-                      children: [
-                        ListTile(
-                          title: Text(title),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                onPressed: () => openMaterialBox(id: id),
-                                icon: const Icon(Icons.settings),
-                              ),
-                              IconButton(
-                                onPressed: () =>
-                                    firestoreServices.deleteMaterial(id),
-                                icon: const Icon(Icons.delete),
-                              ),
-                            ],
-                          ),
+                  return Card(
+                    elevation: 3,
+                    margin: const EdgeInsets.symmetric(vertical: 10),
+                    child: ListTile(
+                      title: Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
-                        ListTile(title: Text(instrument)),
-                        ListTile(title: Text(description)),
-                        ListTile(title: Text(sub)),
-                        ListTile(title: Text(content)),
-                      ],
-                    );
-                  });
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildSubtitleText('Instrument: $instrument'),
+                          _buildSubtitleText('Description: $description'),
+                          _buildSubtitleText('Sub: $sub'),
+                          _buildSubtitleText('Content: $content'),
+                        ],
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            onPressed: () => openMaterialBox(id: id),
+                            icon: const Icon(Icons.edit),
+                          ),
+                          IconButton(
+                            onPressed: () =>
+                                firestoreServices.deleteMaterial(id),
+                            icon: const Icon(Icons.delete),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
             } else {
-              return const Text('There are no material data');
+              return const Center(
+                child: Text(
+                  'There are no material data',
+                  style: TextStyle(fontSize: 16),
+                ),
+              );
             }
           },
         ),
+      ),
+    );
+  }
+
+  Widget _buildSubtitleText(String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Text(
+        text,
+        style: TextStyle(fontSize: 16),
       ),
     );
   }
