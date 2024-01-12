@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../auth.dart';
 import 'package:mari_bermusik/services/firestore.dart';
 
 class HomePage extends StatefulWidget {
@@ -67,63 +69,95 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  final User? user = Auth().currentUser;
+
+  Future<void> signOut() async {
+    await Auth().signOut();
+  }
+
+  Widget _title() {
+    return const Text('Home Page');
+  }
+
+  Widget _userId() {
+    return Text(user?.email ?? 'User email');
+  }
+
+  Widget _signOutButton() {
+    return ElevatedButton(
+      onPressed: signOut,
+      child: const Text('Sign Out'),
+    );
+  }
+
   @override
-  Widget build(BuildContext context) {  
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('HomePage')),
+      appBar: AppBar(
+        title: _title(),
+        actions: <Widget>[
+          _userId(),
+          _signOutButton(),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: openMaterialBox,
         child: const Icon(Icons.add),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: firestoreServices.getMaterials(),
-        builder: (context, snapshots) {
-          if (snapshots.hasData) {
-            List listMaterials = snapshots.data!.docs;
-            return ListView.builder(
-                itemCount: listMaterials.length,
-                itemBuilder: (context, index) {
-                  DocumentSnapshot document = listMaterials[index];
-                  String id = document.id;
+      body: Container(
+        height: double.infinity,
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        child: StreamBuilder<QuerySnapshot>(
+          stream: firestoreServices.getMaterials(),
+          builder: (context, snapshots) {
+            if (snapshots.hasData) {
+              List listMaterials = snapshots.data!.docs;
+              return ListView.builder(
+                  itemCount: listMaterials.length,
+                  itemBuilder: (context, index) {
+                    DocumentSnapshot document = listMaterials[index];
+                    String id = document.id;
 
-                  Map<String, dynamic> data =
-                      document.data() as Map<String, dynamic>;
-                  String title = data['title'];
-                  String instrument = data['instrument'];
-                  String description = data['description'];
-                  String sub = data['sub'];
-                  String content = data['content'];
+                    Map<String, dynamic> data =
+                        document.data() as Map<String, dynamic>;
+                    String title = data['title'];
+                    String instrument = data['instrument'];
+                    String description = data['description'];
+                    String sub = data['sub'];
+                    String content = data['content'];
 
-                  return Column(
-                    children: [
-                      ListTile(
-                        title: Text(title),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              onPressed: () => openMaterialBox(id: id),
-                              icon: const Icon(Icons.settings),
-                            ),
-                            IconButton(
-                              onPressed: () =>
-                                  firestoreServices.deleteMaterial(id),
-                              icon: const Icon(Icons.delete),
-                            ),
-                          ],
+                    return Column(
+                      children: [
+                        ListTile(
+                          title: Text(title),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                onPressed: () => openMaterialBox(id: id),
+                                icon: const Icon(Icons.settings),
+                              ),
+                              IconButton(
+                                onPressed: () =>
+                                    firestoreServices.deleteMaterial(id),
+                                icon: const Icon(Icons.delete),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      ListTile(title: Text(instrument)),
-                      ListTile(title: Text(description)),
-                      ListTile(title: Text(sub)),
-                      ListTile(title: Text(content)),
-                    ],
-                  );
-                });
-          } else {
-            return const Text('There are no material data');
-          }
-        },
+                        ListTile(title: Text(instrument)),
+                        ListTile(title: Text(description)),
+                        ListTile(title: Text(sub)),
+                        ListTile(title: Text(content)),
+                      ],
+                    );
+                  });
+            } else {
+              return const Text('There are no material data');
+            }
+          },
+        ),
       ),
     );
   }
