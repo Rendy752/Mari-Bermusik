@@ -5,7 +5,7 @@ import 'package:mari_bermusik/widget_tree.dart';
 import 'firebase_options.dart';
 // import 'package:mari_bermusik/firebase_options.dart';
 import 'package:mari_bermusik/pages/bottom_navbar.dart';
-import 'package:mari_bermusik/pages/home.dart';
+import 'package:mari_bermusik/pages/material.dart';
 import 'package:mari_bermusik/component/bottom_navbar.dart';
 import 'package:mari_bermusik/component/home_screen.dart';
 

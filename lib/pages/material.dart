@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import '../auth.dart';
 import 'package:mari_bermusik/services/firestore.dart';
 
 class MaterialScreen extends StatefulWidget {
-  const MaterialScreen({Key? key});
+  const MaterialScreen({Key? key}) : super(key: key);
 
   @override
   State<MaterialScreen> createState() => _MaterialScreenState();
@@ -13,55 +14,72 @@ class MaterialScreen extends StatefulWidget {
 
 class _MaterialScreenState extends State<MaterialScreen> {
   final FirestoreServices firestoreServices = FirestoreServices();
-  final TextEditingController title = TextEditingController();
-  final TextEditingController instrument = TextEditingController();
-  final TextEditingController description = TextEditingController();
-  final TextEditingController sub = TextEditingController();
-  final TextEditingController content = TextEditingController();
 
-  void openMaterialBox({String? id}) {
+  void openMaterialBox(
+      {String? id,
+      String? title,
+      String? description,
+      String? instrument,
+      String? sub,
+      String? content}) {
+    final TextEditingController titleController =
+        TextEditingController(text: title);
+    final TextEditingController instrumentController =
+        TextEditingController(text: instrument);
+    final TextEditingController descriptionController =
+        TextEditingController(text: description);
+    final TextEditingController subController =
+        TextEditingController(text: sub);
+    final TextEditingController contentController =
+        TextEditingController(text: content);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        title: Text(id == null ? 'Add Material' : 'Edit Material'),
         content: Column(
           children: [
-            _buildTextField('Title', title),
-            _buildTextField('Instrument', instrument),
-            _buildTextField('Description', description),
-            _buildTextField('Sub', sub),
-            _buildTextField('Content', content),
+            _buildTextField('Title', titleController),
+            _buildTextField('Instrument', instrumentController),
+            _buildTextField('Description', descriptionController),
+            _buildTextField('Sub', subController),
+            _buildTextField('Content', contentController),
           ],
         ),
         actions: [
           ElevatedButton(
             onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
               if (id == null) {
                 firestoreServices.addMaterial(
-                  title.text,
-                  instrument.text,
-                  description.text,
-                  sub.text,
-                  content.text,
+                  titleController.text,
+                  instrumentController.text,
+                  descriptionController.text,
+                  subController.text,
+                  contentController.text,
                 );
-                title.clear();
               } else {
                 firestoreServices.updateMaterial(
                   id,
-                  title.text,
-                  instrument.text,
-                  description.text,
-                  sub.text,
-                  content.text,
+                  titleController.text,
+                  instrumentController.text,
+                  descriptionController.text,
+                  subController.text,
+                  contentController.text,
                 );
-                title.clear();
               }
               Navigator.pop(context);
             },
-            child: const Text('Add'),
+            child: Text(id == null ? 'Add' : 'Update'),
           )
         ],
         elevation: 24.0,
-        backgroundColor: Colors.deepOrange[100],
+        contentPadding: const EdgeInsets.all(30.0),
+        backgroundColor: Colors.orange[200],
       ),
     );
   }
@@ -129,7 +147,16 @@ class _MaterialScreenState extends State<MaterialScreen> {
         child: StreamBuilder<QuerySnapshot>(
           stream: firestoreServices.getMaterials(),
           builder: (context, snapshots) {
-            if (snapshots.hasData) {
+            if (snapshots.connectionState == ConnectionState.waiting) {
+              return Scaffold(
+                body: Center(
+                  child: LoadingAnimationWidget.inkDrop(
+                    color: Colors.orange,
+                    size: 200,
+                  ),
+                ),
+              );
+            } else if (snapshots.hasData) {
               List listMaterials = snapshots.data!.docs;
               return ListView.builder(
                 itemCount: listMaterials.length,
@@ -169,7 +196,13 @@ class _MaterialScreenState extends State<MaterialScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                            onPressed: () => openMaterialBox(id: id),
+                            onPressed: () => openMaterialBox(
+                                id: id,
+                                title: title,
+                                instrument: instrument,
+                                description: description,
+                                sub: sub,
+                                content: content),
                             icon: const Icon(Icons.edit),
                           ),
                           IconButton(
@@ -183,10 +216,17 @@ class _MaterialScreenState extends State<MaterialScreen> {
                   );
                 },
               );
+            } else if (!snapshots.hasData) {
+              return const Center(
+                child: Text(
+                  'Sorry, There Are No Material Data',
+                  style: TextStyle(fontSize: 16),
+                ),
+              );
             } else {
               return const Center(
                 child: Text(
-                  'There are no material data',
+                  'Something Went Wrong',
                   style: TextStyle(fontSize: 16),
                 ),
               );
