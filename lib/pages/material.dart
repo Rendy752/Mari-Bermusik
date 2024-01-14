@@ -84,6 +84,38 @@ class _MaterialScreenState extends State<MaterialScreen> {
     );
   }
 
+  void openDeleteConfirmationBox({
+    required String id,
+    String? title,
+  }) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Confirmation'),
+        content:
+            Text("Are you sure wan't to delete material with title '$title'"),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('No'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              firestoreServices.deleteMaterial(id);
+              Navigator.pop(context);
+            },
+            child: const Text('Yes'),
+          )
+        ],
+        elevation: 24.0,
+        contentPadding: const EdgeInsets.all(30.0),
+        backgroundColor: Colors.orange[200],
+      ),
+    );
+  }
+
   final User? user = Auth().currentUser;
 
   Future<void> signOut() async {
@@ -100,7 +132,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
   Widget _userId() {
     return Text(
       user?.email ?? 'Anonymous',
-      style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+      style: const TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
     );
   }
 
@@ -118,7 +150,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
         controller: controller,
         decoration: InputDecoration(
           labelText: label,
-          border: OutlineInputBorder(),
+          border: const OutlineInputBorder(),
         ),
       ),
     );
@@ -178,7 +210,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
                     child: ListTile(
                       title: Text(
                         title,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -207,7 +239,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
                           ),
                           IconButton(
                             onPressed: () =>
-                                firestoreServices.deleteMaterial(id),
+                                openDeleteConfirmationBox(id: id, title: title),
                             icon: const Icon(Icons.delete),
                           ),
                         ],
@@ -242,7 +274,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Text(
         text,
-        style: TextStyle(fontSize: 16),
+        style: const TextStyle(fontSize: 16),
       ),
     );
   }
