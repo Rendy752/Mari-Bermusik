@@ -11,21 +11,22 @@ class CupertinoNavbar extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoTabScaffold(
       tabBar: CupertinoTabBar(
+        backgroundColor: Colors.white,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.mark_chat_unread_outlined),
+            label: 'Home',
+            tooltip: 'Home',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.menu_book_outlined),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications_none),
+            label: 'Material',
+            tooltip: 'Material',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_pin_circle_outlined),
+            label: 'Profile',
+            tooltip: 'Profile',
           ),
         ],
       ),
@@ -37,13 +38,13 @@ class CupertinoNavbar extends StatelessWidget {
                 child: HomeScreen(),
               );
             });
-          case 2:
+          case 1:
             return CupertinoTabView(builder: (context) {
               return const CupertinoPageScaffold(
                 child: MaterialScreen(),
               );
             });
-          case 4:
+          case 2:
             return CupertinoTabView(builder: (context) {
               return CupertinoPageScaffold(
                 child: LoginRegister(),

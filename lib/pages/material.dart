@@ -205,6 +205,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
                   String content = data['content'];
 
                   return Card(
+                    color: Colors.orange[400],
                     elevation: 3,
                     margin: const EdgeInsets.symmetric(vertical: 10),
                     child: ListTile(
