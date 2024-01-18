@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:mari_bermusik/component/entry_field.dart';
+import 'package:mari_bermusik/component/loading.dart';
 import '../auth.dart';
 import 'package:mari_bermusik/services/firestore.dart';
 
@@ -14,6 +16,20 @@ class MaterialScreen extends StatefulWidget {
 
 class _MaterialScreenState extends State<MaterialScreen> {
   final FirestoreServices firestoreServices = FirestoreServices();
+  ValueNotifier<bool> isLoading = ValueNotifier<bool>(false);
+
+  Widget buildLoadingWidget() {
+    return ValueListenableBuilder<bool>(
+      valueListenable: isLoading,
+      builder: (context, value, child) {
+        if (value) {
+          return const Loading();
+        } else {
+          return Container();
+        }
+      },
+    );
+  }
 
   void openMaterialBox(
       {String? id,
@@ -32,54 +48,108 @@ class _MaterialScreenState extends State<MaterialScreen> {
         TextEditingController(text: sub);
     final TextEditingController contentController =
         TextEditingController(text: content);
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(id == null ? 'Add Material' : 'Edit Material'),
-        content: Column(
+        titlePadding: const EdgeInsets.all(20),
+        title: Row(
           children: [
-            _buildTextField('Title', titleController),
-            _buildTextField('Instrument', instrumentController),
-            _buildTextField('Description', descriptionController),
-            _buildTextField('Sub', subController),
-            _buildTextField('Content', contentController),
+            Icon(id == null ? Icons.add_circle : Icons.edit,
+                color: Colors.blueAccent),
+            const SizedBox(width: 10),
+            Text(
+              id == null ? 'Add Material' : 'Edit Material',
+              style: const TextStyle(
+                color: Colors.blueAccent,
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+                fontFamily: 'Arial',
+              ),
+            ),
           ],
+        ),
+        content: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            children: [
+              EntryField(title: 'Title', controller: titleController),
+              EntryField(title: 'Instrument', controller: instrumentController),
+              EntryField(
+                  title: 'Description', controller: descriptionController),
+              EntryField(title: 'Sub', controller: subController),
+              EntryField(title: 'Content', controller: contentController),
+            ],
+          ),
         ),
         actions: [
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
             },
-            child: const Text('Cancel'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.grey[200],
+              shadowColor: Colors.grey,
+              elevation: 5,
+            ),
+            child: const Text('Cancel',
+                style: TextStyle(
+                    color: Colors.black,
+                    fontFamily: 'Arial',
+                    fontWeight: FontWeight.bold)),
           ),
           ElevatedButton(
-            onPressed: () {
-              if (id == null) {
-                firestoreServices.addMaterial(
-                  titleController.text,
-                  instrumentController.text,
-                  descriptionController.text,
-                  subController.text,
-                  contentController.text,
-                );
-              } else {
-                firestoreServices.updateMaterial(
-                  id,
-                  titleController.text,
-                  instrumentController.text,
-                  descriptionController.text,
-                  subController.text,
-                  contentController.text,
-                );
+            onPressed: () async {
+              BuildContext dialogContext = context;
+              try {
+                setState(() {
+                  isLoading.value = true;
+                });
+                if (id == null) {
+                  await firestoreServices.addMaterial(
+                    Auth().currentUser!.uid,
+                    titleController.text,
+                    instrumentController.text,
+                    descriptionController.text,
+                    subController.text,
+                    contentController.text,
+                  );
+                } else {
+                  await firestoreServices.updateMaterial(
+                    id,
+                    titleController.text,
+                    instrumentController.text,
+                    descriptionController.text,
+                    subController.text,
+                    contentController.text,
+                  );
+                }
+                Navigator.pop(dialogContext);
+              } catch (e) {
+                print('Failed to add or update material: $e');
+              } finally {
+                setState(() {
+                  isLoading.value = false;
+                });
               }
-              Navigator.pop(context);
             },
-            child: Text(id == null ? 'Add' : 'Update'),
-          )
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blueAccent,
+              shadowColor: Colors.blue,
+              elevation: 5,
+            ),
+            child: const Text('Save',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'Arial',
+                    fontWeight: FontWeight.bold)),
+          ),
         ],
-        elevation: 24.0,
-        contentPadding: const EdgeInsets.all(30.0),
-        backgroundColor: Colors.orange[200],
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(color: Colors.grey, width: 2),
+          borderRadius: BorderRadius.circular(15.0),
+        ),
       ),
     );
   }
@@ -91,27 +161,84 @@ class _MaterialScreenState extends State<MaterialScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Confirmation'),
-        content:
-            Text("Are you sure wan't to delete material with title '$title'"),
+        titlePadding: const EdgeInsets.all(20),
+        title: const Row(
+          children: [
+            Icon(Icons.warning, color: Colors.redAccent),
+            SizedBox(width: 10),
+            Text(
+              'Delete Confirmation',
+              style: TextStyle(
+                color: Colors.redAccent,
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+                fontFamily: 'Arial',
+              ),
+            ),
+          ],
+        ),
+        content: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Text(
+            "Are you sure you want to delete material with title '$title'?",
+            style: const TextStyle(
+                color: Colors.black54,
+                fontSize: 18,
+                fontFamily: 'Arial',
+                fontWeight: FontWeight.bold),
+          ),
+        ),
         actions: [
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
             },
-            child: const Text('No'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.grey[200],
+              shadowColor: Colors.grey,
+              elevation: 5,
+            ),
+            child: const Text('No',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontFamily: 'Arial',
+                  fontWeight: FontWeight.bold,
+                )),
           ),
           ElevatedButton(
-            onPressed: () {
-              firestoreServices.deleteMaterial(id);
-              Navigator.pop(context);
+            onPressed: () async {
+              try {
+                setState(() {
+                  isLoading.value = true;
+                });
+                await firestoreServices.deleteMaterial(id);
+              } catch (e) {
+                print('Failed to delete material: $e');
+              } finally {
+                setState(() {
+                  isLoading.value = false;
+                });
+                Navigator.pop(context);
+              }
             },
-            child: const Text('Yes'),
-          )
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              shadowColor: Colors.red,
+              elevation: 5,
+            ),
+            child: const Text('Yes',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'Arial',
+                  fontWeight: FontWeight.bold,
+                )),
+          ),
         ],
-        elevation: 24.0,
-        contentPadding: const EdgeInsets.all(30.0),
-        backgroundColor: Colors.orange[200],
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(color: Colors.grey, width: 2),
+          borderRadius: BorderRadius.circular(15.0),
+        ),
       ),
     );
   }
@@ -143,19 +270,6 @@ class _MaterialScreenState extends State<MaterialScreen> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: TextField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -168,114 +282,215 @@ class _MaterialScreenState extends State<MaterialScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => openMaterialBox(),
-        child: const Icon(Icons.add),
+        backgroundColor: Colors.blueAccent,
+        tooltip: 'Add Item',
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       bottomNavigationBar: Container(
         height: 70.0,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: StreamBuilder<QuerySnapshot>(
-          stream: firestoreServices.getMaterials(),
-          builder: (context, snapshots) {
-            if (snapshots.connectionState == ConnectionState.waiting) {
-              return Scaffold(
-                body: Center(
-                  child: LoadingAnimationWidget.inkDrop(
-                    color: Colors.orange,
-                    size: 200,
-                  ),
-                ),
-              );
-            } else if (snapshots.hasData) {
-              List listMaterials = snapshots.data!.docs;
-              return ListView.builder(
-                itemCount: listMaterials.length,
-                itemBuilder: (context, index) {
-                  DocumentSnapshot document = listMaterials[index];
-                  String id = document.id;
-
-                  Map<String, dynamic> data =
-                      document.data() as Map<String, dynamic>;
-                  String title = data['title'];
-                  String instrument = data['instrument'];
-                  String description = data['description'];
-                  String sub = data['sub'];
-                  String content = data['content'];
-
-                  return Card(
-                    color: Colors.orange[400],
-                    elevation: 3,
-                    margin: const EdgeInsets.symmetric(vertical: 10),
-                    child: ListTile(
-                      title: Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildSubtitleText('Instrument: $instrument'),
-                          _buildSubtitleText('Description: $description'),
-                          _buildSubtitleText('Sub: $sub'),
-                          _buildSubtitleText('Content: $content'),
-                        ],
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            onPressed: () => openMaterialBox(
-                                id: id,
-                                title: title,
-                                instrument: instrument,
-                                description: description,
-                                sub: sub,
-                                content: content),
-                            icon: const Icon(Icons.edit),
-                          ),
-                          IconButton(
-                            onPressed: () =>
-                                openDeleteConfirmationBox(id: id, title: title),
-                            icon: const Icon(Icons.delete),
-                          ),
-                        ],
+      body: Stack(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: StreamBuilder<QuerySnapshot>(
+              stream: firestoreServices.getMaterials(),
+              builder: (context, snapshots) {
+                if (snapshots.connectionState == ConnectionState.waiting) {
+                  return Scaffold(
+                    body: Center(
+                      child: LoadingAnimationWidget.inkDrop(
+                        color: Colors.orange,
+                        size: 200,
                       ),
                     ),
                   );
-                },
-              );
-            } else if (!snapshots.hasData) {
-              return const Center(
-                child: Text(
-                  'Sorry, There Are No Material Data',
-                  style: TextStyle(fontSize: 16),
-                ),
-              );
-            } else {
-              return const Center(
-                child: Text(
-                  'Something Went Wrong',
-                  style: TextStyle(fontSize: 16),
-                ),
-              );
-            }
-          },
-        ),
-      ),
-    );
-  }
+                } else if (snapshots.hasData) {
+                  List listMaterials = snapshots.data!.docs;
+                  return ListView.builder(
+                    itemCount: listMaterials.length,
+                    itemBuilder: (context, index) {
+                      DocumentSnapshot document = listMaterials[index];
+                      String id = document.id;
 
-  Widget _buildSubtitleText(String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Text(
-        text,
-        style: const TextStyle(fontSize: 16),
+                      Map<String, dynamic> data =
+                          document.data() as Map<String, dynamic>;
+                      String title = data['title'];
+                      String instrument = data['instrument'];
+                      String description = data['description'];
+                      String sub = data['sub'];
+                      String content = data['content'];
+
+                      return Card(
+                        color: Colors.orange[400],
+                        elevation: 5.0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15.0),
+                        ),
+                        margin: const EdgeInsets.all(10.0),
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: ListTile(
+                            leading:
+                                const Icon(Icons.book, color: Colors.white),
+                            title: ShaderMask(
+                              shaderCallback: (bounds) => const LinearGradient(
+                                colors: [Colors.blue, Colors.purple],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ).createShader(bounds),
+                              child: Text(
+                                title,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  fontFamily: 'Pacifico', // Use a custom font
+                                ),
+                              ),
+                            ),
+                            subtitle: Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(color: Colors.grey),
+                                  borderRadius: BorderRadius.circular(5.0),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 5,
+                                      blurRadius: 7,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: RichText(
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: 'Description \n',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.grey[800],
+                                            fontFamily: 'Roboto',
+                                          ),
+                                        ),
+                                        WidgetSpan(
+                                          child: ShaderMask(
+                                            shaderCallback: (bounds) =>
+                                                const LinearGradient(
+                                              colors: [
+                                                Colors.blue,
+                                                Colors.purple
+                                              ],
+                                              begin: Alignment.topCenter,
+                                              end: Alignment.bottomCenter,
+                                            ).createShader(bounds),
+                                            child: Text(
+                                              description,
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.white,
+                                                fontFamily: 'OpenSans',
+                                                letterSpacing: 0.5,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Tooltip(
+                                  message: 'Edit $title',
+                                  decoration: BoxDecoration(
+                                    color: Colors.blueAccent,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  textStyle:
+                                      const TextStyle(color: Colors.white),
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(50),
+                                      onTap: () => openMaterialBox(
+                                          id: id,
+                                          title: title,
+                                          instrument: instrument,
+                                          description: description,
+                                          sub: sub,
+                                          content: content),
+                                      child: const Padding(
+                                        padding: EdgeInsets.all(5.0),
+                                        child: Icon(Icons.edit,
+                                            color: Colors.blueAccent),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10.0),
+                                Tooltip(
+                                  message: 'Delete $title',
+                                  decoration: BoxDecoration(
+                                    color: Colors.redAccent,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  textStyle:
+                                      const TextStyle(color: Colors.white),
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(50),
+                                      onTap: () => openDeleteConfirmationBox(
+                                          id: id, title: title),
+                                      child: const Padding(
+                                        padding: EdgeInsets.all(5.0),
+                                        child: Icon(Icons.delete,
+                                            color: Colors.redAccent),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                } else if (!snapshots.hasData) {
+                  return const Center(
+                    child: Text(
+                      'Sorry, There Are No Material Data',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  );
+                } else {
+                  return const Center(
+                    child: Text(
+                      'Something Went Wrong',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  );
+                }
+              },
+            ),
+          ),
+          buildLoadingWidget()
+        ],
       ),
     );
   }

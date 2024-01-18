@@ -5,9 +5,12 @@ class FirestoreServices {
       FirebaseFirestore.instance.collection('material');
 
   // add material
-  Future<void> addMaterial(String title, String instrument, String description,
-      String sub, String content) {
+  Future<void> addMaterial(String uid, String title, String instrument,
+      String description, String sub, String content) {
+    String id = materials.doc().id;
     return materials.add({
+      'id': id,
+      'user_id': uid,
       'title': title,
       'instrument': instrument,
       'description': description,
@@ -23,6 +26,11 @@ class FirestoreServices {
     final listMaterials =
         materials.orderBy('updated_at', descending: true).snapshots();
     return listMaterials;
+  }
+
+  // get material by id
+  Future<DocumentSnapshot> getMaterialById(String id) {
+    return materials.doc(id).get();
   }
 
   // edit material
