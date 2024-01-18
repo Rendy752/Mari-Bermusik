@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Auth {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   User? get currentUser => _firebaseAuth.currentUser;
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
 
@@ -15,14 +17,33 @@ class Auth {
     );
   }
 
-  Future<void> createUserWithEmailAndPassword({
-    required String email,
-    required String password,
-  }) async {
-    await _firebaseAuth.createUserWithEmailAndPassword(
+  Future<void> createUserWithEmailAndPassword(
+      {required String name,
+      required String username,
+      required String email,
+      required String password}) async {
+    var usernameQuery = await _firestore
+        .collection('users')
+        .where('username', isEqualTo: username)
+        .get();
+
+    if (usernameQuery.docs.isNotEmpty) {
+      throw Exception('Username already taken');
+    }
+
+    UserCredential userCredential =
+        await _firebaseAuth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
+
+    await userCredential.user!.updateDisplayName(name);
+
+    await _firestore.collection('users').doc(userCredential.user!.uid).set({
+      'uid': userCredential.user!.uid,
+      'name': name,
+      'username': username,
+    });
   }
 
   Future<void> signOut() async {
