@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mari_bermusik/services/firestore.dart';
+import 'dart:math';
 
 class MaterialCard extends StatefulWidget {
   final String id;
@@ -31,11 +32,40 @@ class MaterialCard extends StatefulWidget {
 }
 
 class _MaterialCardState extends State<MaterialCard> {
-  bool isFavorite = false;
   final FirestoreServices firestoreServices = FirestoreServices();
   final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+  bool isFavorite = false;
   bool isUserLoggedIn() {
     return FirebaseAuth.instance.currentUser != null;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkFavoriteStatus();
+  }
+
+  void checkFavoriteStatus() async {
+    if (currentUserId != null) {
+      final favoriteStatus =
+          await firestoreServices.isMaterialFavorite(currentUserId!, widget.id);
+      setState(() {
+        isFavorite = favoriteStatus;
+      });
+    }
+  }
+
+  String getInstrumentImage(instrument) {
+    if (instrument != 'guitar' &&
+        instrument != 'piano' &&
+        instrument != 'drums' &&
+        instrument != 'violin' &&
+        instrument != 'flute' &&
+        instrument != 'clarinet') return 'assets/images/questionMark.jpg';
+    List<String> postfixes = ['1', '2'];
+    Random random = Random();
+    String postfix = postfixes[random.nextInt(postfixes.length)];
+    return 'assets/images/${instrument.toLowerCase()}$postfix.jpg';
   }
 
   @override
@@ -50,7 +80,12 @@ class _MaterialCardState extends State<MaterialCard> {
       child: Padding(
         padding: const EdgeInsets.all(10.0),
         child: ListTile(
-          leading: const Icon(Icons.book, color: Colors.white),
+          leading: ClipRRect(
+            borderRadius: BorderRadius.circular(10.0),
+            child: Image(
+              image: AssetImage(getInstrumentImage(widget.instrument)),
+            ),
+          ),
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[

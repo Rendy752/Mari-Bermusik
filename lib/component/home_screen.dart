@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: HomeScreen(),
     );
   }
 }
 
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,14 +25,14 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           children: [
             // Header
-            Container(
+            SizedBox(
               height: 110, // Ubah tinggi header menjadi 120
               child: ClipPath(
                 clipper: HeaderClipper(),
                 child: Container(
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Color.fromRGBO(218, 192, 163, 1),
+                    color: const Color.fromRGBO(218, 192, 163, 1),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.2),
@@ -44,7 +48,7 @@ class HomeScreen extends StatelessWidget {
                       Expanded(
                         child: RichText(
                           textAlign: TextAlign.start, // Teks diatur ke kanan
-                          text: TextSpan(
+                          text: const TextSpan(
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -76,8 +80,8 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             // Judul Courses
-            Padding(
-              padding: const EdgeInsets.all(20.0),
+            const Padding(
+              padding: EdgeInsets.all(20.0),
               child: Text(
                 "Courses",
                 style: TextStyle(
@@ -90,9 +94,9 @@ class HomeScreen extends StatelessWidget {
             Container(
               width: double.infinity,
               height: 500,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage('assets/images/guitar.jpg'),
+                  image: AssetImage('assets/images/guitar1.jpg'),
                   fit: BoxFit.contain,
                 ),
               ),
@@ -105,6 +109,8 @@ class HomeScreen extends StatelessWidget {
 }
 
 class BottomNavbar extends StatefulWidget {
+  const BottomNavbar({super.key});
+
   @override
   BottomNavBarState createState() => BottomNavBarState();
 }
@@ -134,7 +140,7 @@ class BottomNavBarState extends State<BottomNavbar> {
         width: double.infinity,
         child: ListView.builder(
           itemCount: data.length,
-          padding: EdgeInsets.symmetric(horizontal: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           itemBuilder: (ctx, i) => Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child: GestureDetector(
@@ -144,11 +150,11 @@ class BottomNavBarState extends State<BottomNavbar> {
                 });
               },
               child: AnimatedContainer(
-                duration: Duration(milliseconds: 280),
+                duration: const Duration(milliseconds: 280),
                 width: 40,
                 decoration: BoxDecoration(
                   border: i == selectedIndex
-                      ? Border(
+                      ? const Border(
                           top: BorderSide(width: 2.0, color: Colors.blue),
                         )
                       : null,

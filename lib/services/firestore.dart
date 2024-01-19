@@ -76,7 +76,17 @@ class FirestoreServices {
   }
 
   // get favorite materials based on user id
-  Future<QuerySnapshot> getFavoriteMaterials(String userId) {
-    return favoriteMaterials.where('user_id', isEqualTo: userId).get();
+  Stream<QuerySnapshot> getFavoriteMaterials(String userId) {
+    return favoriteMaterials.where('user_id', isEqualTo: userId).snapshots();
+  }
+
+  // check if material is favorite
+  Future<bool> isMaterialFavorite(String userId, String materialId) async {
+    final querySnapshot = await favoriteMaterials
+        .where('user_id', isEqualTo: userId)
+        .where('material_id', isEqualTo: materialId)
+        .get();
+
+    return querySnapshot.docs.isNotEmpty;
   }
 }

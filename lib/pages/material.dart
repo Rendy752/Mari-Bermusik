@@ -246,28 +246,10 @@ class _MaterialScreenState extends State<MaterialScreen> {
 
   final User? user = Auth().currentUser;
 
-  Future<void> signOut() async {
-    await Auth().signOut();
-  }
-
   Widget _title() {
     return const Text(
       'Material Page',
       style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-    );
-  }
-
-  Widget _userId() {
-    return Text(
-      user?.email ?? 'Anonymous',
-      style: const TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
-    );
-  }
-
-  Widget _signOutButton() {
-    return ElevatedButton(
-      onPressed: signOut,
-      child: const Text('Sign Out'),
     );
   }
 
@@ -276,10 +258,6 @@ class _MaterialScreenState extends State<MaterialScreen> {
     return Scaffold(
       appBar: AppBar(
         title: _title(),
-        actions: <Widget>[
-          _userId(),
-          _signOutButton(),
-        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => openMaterialBox(),

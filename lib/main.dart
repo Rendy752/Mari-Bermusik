@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:mari_bermusik/component/custom_navigator_home_page.dart';
-import 'package:mari_bermusik/widget_tree.dart';
 import 'firebase_options.dart';
-import 'package:mari_bermusik/pages/bottom_navbar.dart';
-import 'package:mari_bermusik/pages/material.dart';
-import 'package:mari_bermusik/component/bottom_navbar.dart';
-import 'package:mari_bermusik/component/home_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
