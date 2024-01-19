@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class FirestoreServices {
   final CollectionReference materials =
       FirebaseFirestore.instance.collection('material');
+  final CollectionReference favoriteMaterials =
+      FirebaseFirestore.instance.collection('favorite_material');
 
   // add material
   Future<void> addMaterial(String uid, String title, String instrument,
@@ -49,5 +51,32 @@ class FirestoreServices {
   // delete material
   Future<void> deleteMaterial(String id) {
     return materials.doc(id).delete();
+  }
+
+  // add material favorite
+  Future<void> addFavoriteMaterial(String userId, String materialId) {
+    return favoriteMaterials.add({
+      'user_id': userId,
+      'material_id': materialId,
+      'created_at': Timestamp.now(),
+    });
+  }
+
+  // delete material favorite
+  Future<void> removeFavoriteMaterial(String userId, String materialId) {
+    return favoriteMaterials
+        .where('user_id', isEqualTo: userId)
+        .where('material_id', isEqualTo: materialId)
+        .get()
+        .then((querySnapshot) async {
+      for (var doc in querySnapshot.docs) {
+        await doc.reference.delete();
+      }
+    });
+  }
+
+  // get favorite materials based on user id
+  Future<QuerySnapshot> getFavoriteMaterials(String userId) {
+    return favoriteMaterials.where('user_id', isEqualTo: userId).get();
   }
 }

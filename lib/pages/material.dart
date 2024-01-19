@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mari_bermusik/component/entry_field.dart';
 import 'package:mari_bermusik/component/loading.dart';
+import 'package:mari_bermusik/component/material_card.dart';
 import '../auth.dart';
 import 'package:mari_bermusik/services/firestore.dart';
 
@@ -319,156 +320,24 @@ class _MaterialScreenState extends State<MaterialScreen> {
 
                       Map<String, dynamic> data =
                           document.data() as Map<String, dynamic>;
+                      String userId = data['user_id'];
                       String title = data['title'];
                       String instrument = data['instrument'];
                       String description = data['description'];
                       String sub = data['sub'];
                       String content = data['content'];
 
-                      return Card(
-                        color: Colors.orange[400],
-                        elevation: 5.0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15.0),
-                        ),
-                        margin: const EdgeInsets.all(10.0),
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: ListTile(
-                            leading:
-                                const Icon(Icons.book, color: Colors.white),
-                            title: ShaderMask(
-                              shaderCallback: (bounds) => const LinearGradient(
-                                colors: [Colors.blue, Colors.purple],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                              ).createShader(bounds),
-                              child: Text(
-                                title,
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  fontFamily: 'Pacifico', // Use a custom font
-                                ),
-                              ),
-                            ),
-                            subtitle: Padding(
-                              padding: const EdgeInsets.only(top: 8.0),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  border: Border.all(color: Colors.grey),
-                                  borderRadius: BorderRadius.circular(5.0),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 5,
-                                      blurRadius: 7,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: RichText(
-                                    text: TextSpan(
-                                      children: [
-                                        TextSpan(
-                                          text: 'Description \n',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.grey[800],
-                                            fontFamily: 'Roboto',
-                                          ),
-                                        ),
-                                        WidgetSpan(
-                                          child: ShaderMask(
-                                            shaderCallback: (bounds) =>
-                                                const LinearGradient(
-                                              colors: [
-                                                Colors.blue,
-                                                Colors.purple
-                                              ],
-                                              begin: Alignment.topCenter,
-                                              end: Alignment.bottomCenter,
-                                            ).createShader(bounds),
-                                            child: Text(
-                                              description,
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.white,
-                                                fontFamily: 'OpenSans',
-                                                letterSpacing: 0.5,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Tooltip(
-                                  message: 'Edit $title',
-                                  decoration: BoxDecoration(
-                                    color: Colors.blueAccent,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  textStyle:
-                                      const TextStyle(color: Colors.white),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      borderRadius: BorderRadius.circular(50),
-                                      onTap: () => openMaterialBox(
-                                          id: id,
-                                          title: title,
-                                          instrument: instrument,
-                                          description: description,
-                                          sub: sub,
-                                          content: content),
-                                      child: const Padding(
-                                        padding: EdgeInsets.all(5.0),
-                                        child: Icon(Icons.edit,
-                                            color: Colors.blueAccent),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 10.0),
-                                Tooltip(
-                                  message: 'Delete $title',
-                                  decoration: BoxDecoration(
-                                    color: Colors.redAccent,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  textStyle:
-                                      const TextStyle(color: Colors.white),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      borderRadius: BorderRadius.circular(50),
-                                      onTap: () => openDeleteConfirmationBox(
-                                          id: id, title: title),
-                                      child: const Padding(
-                                        padding: EdgeInsets.all(5.0),
-                                        child: Icon(Icons.delete,
-                                            color: Colors.redAccent),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
+                      return MaterialCard(
+                          id: id,
+                          userId: userId,
+                          title: title,
+                          instrument: instrument,
+                          description: description,
+                          sub: sub,
+                          content: content,
+                          openMaterialBoxCallback: openMaterialBox,
+                          openDeleteConfirmationBoxCallback:
+                              openDeleteConfirmationBox);
                     },
                   );
                 } else if (!snapshots.hasData) {
