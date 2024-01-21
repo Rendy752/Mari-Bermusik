@@ -60,7 +60,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Container(
               height: 150,
               width: double.infinity,
-              color: Colors.orangeAccent,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.blue,
+                    Colors.lightBlueAccent
+                  ], // gradient colors
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+              ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -76,7 +85,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Container(
                             decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: Colors.orange,
+                                  color: Colors.blue,
                                   width: 2,
                                 ),
                                 shape: BoxShape.circle),
@@ -91,7 +100,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               onPressed: () {},
                               icon: Icon(
                                 Icons.camera_alt,
-                                color: Colors.orange[100],
+                                color: Colors.blue[100],
                               ),
                             ),
                         ],

@@ -11,9 +11,9 @@ class TopNavbar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       title: Text(
         title,
-        textAlign: TextAlign.center, // center alignment
+        textAlign: TextAlign.center,
         style: const TextStyle(
-          fontSize: 28, // increase font size
+          fontSize: 28,
           fontWeight: FontWeight.bold,
           color: Colors.white,
           shadows: [
@@ -29,14 +29,13 @@ class TopNavbar extends StatelessWidget implements PreferredSizeWidget {
       flexibleSpace: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.blue, Colors.lightBlueAccent], // gradient colors
+            colors: [Colors.blue, Colors.lightBlueAccent],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
           ),
         ),
       ),
-      backgroundColor:
-          Colors.transparent, // make it transparent to show the gradient
+      backgroundColor: Colors.transparent,
       elevation: 0.0,
       systemOverlayStyle: SystemUiOverlayStyle.dark,
       iconTheme: const IconThemeData(color: Colors.white),
