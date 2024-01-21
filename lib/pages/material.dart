@@ -270,74 +270,76 @@ class _MaterialScreenState extends State<MaterialScreen> {
       bottomNavigationBar: Container(
         height: 70.0,
       ),
-      body: Stack(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: StreamBuilder<QuerySnapshot>(
-              stream: firestoreServices.getMaterials(),
-              builder: (context, snapshots) {
-                if (snapshots.connectionState == ConnectionState.waiting) {
-                  return Scaffold(
-                    body: Center(
-                      child: LoadingAnimationWidget.inkDrop(
-                        color: Colors.orange,
-                        size: 200,
+      body: Center(
+        child: Stack(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: StreamBuilder<QuerySnapshot>(
+                stream: firestoreServices.getMaterials(),
+                builder: (context, snapshots) {
+                  if (snapshots.connectionState == ConnectionState.waiting) {
+                    return Scaffold(
+                      body: Center(
+                        child: LoadingAnimationWidget.inkDrop(
+                          color: Colors.orange,
+                          size: 200,
+                        ),
                       ),
-                    ),
-                  );
-                } else if (snapshots.hasData) {
-                  List listMaterials = snapshots.data!.docs;
-                  return ListView.builder(
-                    itemCount: listMaterials.length,
-                    itemBuilder: (context, index) {
-                      DocumentSnapshot document = listMaterials[index];
-                      String id = document.id;
+                    );
+                  } else if (snapshots.hasData) {
+                    List listMaterials = snapshots.data!.docs;
+                    return ListView.builder(
+                      itemCount: listMaterials.length,
+                      itemBuilder: (context, index) {
+                        DocumentSnapshot document = listMaterials[index];
+                        String id = document.id;
 
-                      Map<String, dynamic> data =
-                          document.data() as Map<String, dynamic>;
-                      String userId = data['user_id'];
-                      String title = data['title'];
-                      String instrument = data['instrument'];
-                      String description = data['description'];
-                      String sub = data['sub'];
-                      String content = data['content'];
+                        Map<String, dynamic> data =
+                            document.data() as Map<String, dynamic>;
+                        String userId = data['user_id'];
+                        String title = data['title'];
+                        String instrument = data['instrument'];
+                        String description = data['description'];
+                        String sub = data['sub'];
+                        String content = data['content'];
 
-                      return MaterialCard(
-                          id: id,
-                          userId: userId,
-                          title: title,
-                          instrument: instrument,
-                          description: description,
-                          sub: sub,
-                          content: content,
-                          openMaterialBoxCallback: openMaterialBox,
-                          openDeleteConfirmationBoxCallback:
-                              openDeleteConfirmationBox);
-                    },
-                  );
-                } else if (!snapshots.hasData) {
-                  return const Center(
-                    child: Text(
-                      'Sorry, There Are No Material Data',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  );
-                } else if (snapshots.hasError) {
-                  return Text('Error: ${snapshots.error}');
-                } else {
-                  return const Center(
-                    child: Text(
-                      'Something Went Wrong',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  );
-                }
-              },
+                        return MaterialCard(
+                            id: id,
+                            userId: userId,
+                            title: title,
+                            instrument: instrument,
+                            description: description,
+                            sub: sub,
+                            content: content,
+                            openMaterialBoxCallback: openMaterialBox,
+                            openDeleteConfirmationBoxCallback:
+                                openDeleteConfirmationBox);
+                      },
+                    );
+                  } else if (!snapshots.hasData) {
+                    return const Center(
+                      child: Text(
+                        'Sorry, There Are No Material Data',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    );
+                  } else if (snapshots.hasError) {
+                    return Text('Error: ${snapshots.error}');
+                  } else {
+                    return const Center(
+                      child: Text(
+                        'Something Went Wrong',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    );
+                  }
+                },
+              ),
             ),
-          ),
-          buildLoadingWidget()
-        ],
+            buildLoadingWidget()
+          ],
+        ),
       ),
     );
   }
