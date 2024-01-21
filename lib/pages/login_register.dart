@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mari_bermusik/auth.dart';
 import 'package:flutter/material.dart';
@@ -33,10 +35,7 @@ class _LoginRegisterState extends State<LoginRegister> {
         password: _password.text,
       );
       if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const ProfileScreen()),
-        );
+        Navigator.pop(context);
       }
     } on FirebaseAuthException catch (e) {
       if (mounted) {
@@ -58,6 +57,30 @@ class _LoginRegisterState extends State<LoginRegister> {
       setState(() {
         isLoading.value = true;
       });
+      if (_name.text.isEmpty) {
+        setState(() {
+          errorMessage = 'Name cannot be empty';
+        });
+        return;
+      }
+      if (_username.text.isEmpty) {
+        setState(() {
+          errorMessage = 'Username cannot be empty';
+        });
+        return;
+      }
+      if (_email.text.isEmpty) {
+        setState(() {
+          errorMessage = 'Email cannot be empty';
+        });
+        return;
+      }
+      if (_password.text.isEmpty) {
+        setState(() {
+          errorMessage = 'Password cannot be empty';
+        });
+        return;
+      }
       await Auth().createUserWithEmailAndPassword(
         name: _name.text,
         username: _username.text,
@@ -92,6 +115,29 @@ class _LoginRegisterState extends State<LoginRegister> {
     );
   }
 
+  Widget _header() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 20.0),
+      alignment: Alignment.center,
+      child: Text(
+        isLogin ? 'Login to your account' : 'Create a new account',
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+          shadows: [
+            Shadow(
+              blurRadius: 10.0,
+              color: Colors.black,
+              offset: Offset(5.0, 5.0),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _errorMessage() {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
@@ -107,16 +153,33 @@ class _LoginRegisterState extends State<LoginRegister> {
   }
 
   Widget _submitButton() {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue,
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        gradient: const LinearGradient(
+          colors: [Colors.blue, Colors.lightBlueAccent],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
       ),
-      onPressed:
-          isLogin ? signInWithEmailAndPassword : createUserWithEmailAndPassword,
-      child: Text(
-        isLogin ? 'Login' : 'Register',
-        style: const TextStyle(
-            fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          padding: const EdgeInsets.symmetric(vertical: 15),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        onPressed: isLogin
+            ? signInWithEmailAndPassword
+            : createUserWithEmailAndPassword,
+        child: Text(
+          isLogin ? 'Login' : 'Register',
+          style: const TextStyle(
+              fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),
+        ),
       ),
     );
   }
@@ -127,56 +190,82 @@ class _LoginRegisterState extends State<LoginRegister> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(isLogin
-              ? 'Don\'t have an account ? '
-              : 'Already have an account ?'),
+          Text(
+            isLogin ? 'Don\'t have an account ? ' : 'Already have an account ?',
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
           TextButton(
             onPressed: () {
               setState(() {
                 isLogin = !isLogin;
               });
             },
-            child: Text(isLogin ? 'Register' : 'Login'),
+            child: Text(
+              isLogin ? 'Register' : 'Login',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
     );
   }
 
+  final List<String> images = [
+    "musicalInstrument",
+    "clarinet1",
+    "drums1",
+    "flute1",
+    "guitar1",
+    "piano1",
+    "violin1",
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: TopNavbar(title: isLogin ? 'Login' : 'Register'),
-      body: Stack(
-        children: <Widget>[
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15.0),
-            ),
-            elevation: 10,
-            color: Colors.orange[400],
-            margin: const EdgeInsets.all(20),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  if (!isLogin) EntryField(title: 'Name', controller: _name),
-                  if (!isLogin)
-                    EntryField(title: 'Username', controller: _username),
-                  EntryField(title: 'Email', controller: _email),
-                  EntryField(title: 'Password', controller: _password),
-                  _errorMessage(),
-                  const SizedBox(height: 20),
-                  _submitButton(),
-                  _loginOrRegisterButton(),
-                ],
-              ),
+      body: SingleChildScrollView(
+        child: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(
+                  "assets/images/${images[Random().nextInt(images.length)]}.jpg"),
+              fit: BoxFit.cover,
             ),
           ),
-          buildLoadingWidget()
-        ],
+          child: Stack(
+            children: <Widget>[
+              Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                elevation: 10,
+                color: Colors.orange[400],
+                margin: const EdgeInsets.all(20),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      _header(),
+                      const SizedBox(height: 20),
+                      if (!isLogin)
+                        EntryField(title: 'Name', controller: _name),
+                      if (!isLogin)
+                        EntryField(title: 'Username', controller: _username),
+                      EntryField(title: 'Email', controller: _email),
+                      EntryField(title: 'Password', controller: _password),
+                      _errorMessage(),
+                      _submitButton(),
+                      _loginOrRegisterButton(),
+                    ],
+                  ),
+                ),
+              ),
+              buildLoadingWidget()
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -20,6 +20,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return FirebaseAuth.instance.currentUser != null;
   }
 
+  Key key = UniqueKey();
+
+  void refresh() {
+    setState(() {
+      key = UniqueKey();
+    });
+  }
+
   void signIn() {
     Navigator.push(
       context,
@@ -29,21 +37,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void signOut() {
     FirebaseAuth.instance.signOut();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const LoginRegister()),
-    );
+    refresh();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const TopNavbar(title: "Profile Page"),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => refresh(),
+        backgroundColor: Colors.blueAccent,
+        tooltip: 'Refresh',
+        child: const Icon(
+          Icons.refresh,
+          color: Colors.white,
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: SingleChildScrollView(
         child: Stack(
           children: [
             Container(
-              height: 200,
+              height: 150,
               width: double.infinity,
               color: Colors.orangeAccent,
             ),
@@ -54,7 +69,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Align(
                     alignment: Alignment.topCenter,
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 150),
+                      padding: const EdgeInsets.only(top: 100),
                       child: Stack(
                         alignment: Alignment.bottomRight,
                         children: [
@@ -92,7 +107,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             margin: const EdgeInsets.symmetric(vertical: 20.0),
                             child: const CircularProgressIndicator());
                       } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
+                        return Container(
+                            margin: const EdgeInsets.symmetric(vertical: 20.0),
+                            child: Text('Error ${snapshot.error}',
+                                style: const TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold)));
                       } else {
                         Map<String, dynamic> userProfile = snapshot.data!;
                         return Column(
@@ -141,18 +162,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 }
                               },
                             ),
-                            isUserLoggedIn()
-                                ? TextButton(
-                                    onPressed: signOut,
-                                    child: const Text('Sign Out'))
-                                : TextButton(
-                                    onPressed: signIn,
-                                    child: const Text('Sign In'))
                           ],
                         );
                       }
                     },
                   ),
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.symmetric(vertical: 20.0),
+                    child: isUserLoggedIn()
+                        ? ElevatedButton(
+                            onPressed: signOut,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              shadowColor: Colors.black,
+                              elevation: 5,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 12),
+                            ),
+                            child: const Text('Sign Out',
+                                style: TextStyle(
+                                    fontSize: 20, color: Colors.white)),
+                          )
+                        : ElevatedButton(
+                            onPressed: signIn,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              shadowColor: Colors.black,
+                              elevation: 5,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 12),
+                            ),
+                            child: const Text('Sign In',
+                                style: TextStyle(
+                                    fontSize: 20, color: Colors.white)),
+                          ),
+                  )
                 ],
               ),
             ),

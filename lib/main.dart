@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:mari_bermusik/component/custom_navigator_home_page.dart';
+import 'package:mari_bermusik/component/bottom_navbar.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -19,7 +19,7 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.orange),
-      home: const CupertinoNavbar(),
+      home: const BottomNavbar(),
     );
   }
 }

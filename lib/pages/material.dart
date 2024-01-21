@@ -71,17 +71,20 @@ class _MaterialScreenState extends State<MaterialScreen> {
             ),
           ],
         ),
-        content: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            children: [
-              EntryField(title: 'Title', controller: titleController),
-              EntryField(title: 'Instrument', controller: instrumentController),
-              EntryField(
-                  title: 'Description', controller: descriptionController),
-              EntryField(title: 'Sub', controller: subController),
-              EntryField(title: 'Content', controller: contentController),
-            ],
+        content: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              children: [
+                EntryField(title: 'Title', controller: titleController),
+                EntryField(
+                    title: 'Instrument', controller: instrumentController),
+                EntryField(
+                    title: 'Description', controller: descriptionController),
+                EntryField(title: 'Sub', controller: subController),
+                EntryField(title: 'Content', controller: contentController),
+              ],
+            ),
           ),
         ),
         actions: [
@@ -181,15 +184,17 @@ class _MaterialScreenState extends State<MaterialScreen> {
             ),
           ],
         ),
-        content: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Text(
-            "Are you sure you want to delete material with title '$title'?",
-            style: const TextStyle(
-                color: Colors.black54,
-                fontSize: 18,
-                fontFamily: 'Arial',
-                fontWeight: FontWeight.bold),
+        content: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Text(
+              "Are you sure you want to delete material with title '$title'?",
+              style: const TextStyle(
+                  color: Colors.black54,
+                  fontSize: 18,
+                  fontFamily: 'Arial',
+                  fontWeight: FontWeight.bold),
+            ),
           ),
         ),
         actions: [
@@ -267,10 +272,13 @@ class _MaterialScreenState extends State<MaterialScreen> {
             )
           : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      bottomNavigationBar: Container(
-        height: 70.0,
-      ),
-      body: Center(
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/images/musicalInstrument.jpg"),
+            fit: BoxFit.cover,
+          ),
+        ),
         child: Stack(
           children: <Widget>[
             Padding(

@@ -1,67 +1,79 @@
 import 'package:flutter/material.dart';
+import 'package:mari_bermusik/pages/home_screen.dart';
+import 'package:mari_bermusik/pages/material.dart';
+import 'package:mari_bermusik/pages/profile_screen.dart';
 
 class BottomNavbar extends StatefulWidget {
+  const BottomNavbar({Key? key}) : super(key: key);
+
   @override
-  BottomNavBarState createState() => BottomNavBarState();
+  State<BottomNavbar> createState() => _BottomNavbarState();
 }
 
-class BottomNavBarState extends State<BottomNavbar> {
-  int selectedIndex = 0;
-  List<IconData> data = [
-    Icons.home,
-    Icons.mark_chat_unread_outlined,
-    Icons.menu_book_outlined,
-    Icons.notifications_none,
-    Icons.person_pin_circle_outlined,
+class _BottomNavbarState extends State<BottomNavbar> {
+  int _currentIndex = 0;
+  final _pageController = PageController();
+  final List<Widget> _pages = [
+    const HomeScreen(),
+    const MaterialScreen(),
+    const ProfileScreen()
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: Material(
-        elevation: 10,
-        color: Colors.white,
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(width: 2.0, color: Colors.grey.shade500),
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        children: _pages,
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.white,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.grey[400]!.withOpacity(0.7),
+        type: BottomNavigationBarType.shifting,
+        elevation: 5,
+        currentIndex: _currentIndex,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.home,
+              size: 30.0,
             ),
+            activeIcon: Icon(Icons.home, size: 35.0),
+            label: 'Home',
+            backgroundColor: Colors.blue,
           ),
-          height: 70,
-          width: double.infinity,
-          child: ListView.builder(
-            itemCount: data.length,
-            padding: EdgeInsets.symmetric(horizontal: 10),
-            itemBuilder: (ctx, i) => Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selectedIndex = i;
-                  });
-                },
-                child: AnimatedContainer(
-                  duration: Duration(milliseconds: 280),
-                  width: 40,
-                  decoration: BoxDecoration(
-                    border: i == selectedIndex
-                        ? Border(
-                            top: BorderSide(width: 2.0, color: Colors.blue),
-                          )
-                        : null,
-                  ),
-                  child: Icon(
-                    data[i],
-                    size: 35,
-                    color:
-                        i == selectedIndex ? Colors.blue : Colors.grey.shade800,
-                  ),
-                ),
-              ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.book,
+              size: 30.0,
             ),
-            scrollDirection: Axis.horizontal,
+            activeIcon: Icon(Icons.home, size: 35.0),
+            label: 'Material',
+            backgroundColor: Colors.green,
           ),
-        ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.person,
+              size: 30.0,
+            ),
+            activeIcon: Icon(Icons.home, size: 35.0),
+            label: 'Profile',
+            backgroundColor: Colors.purple,
+          ),
+        ],
+        onTap: (index) {
+          _pageController.animateToPage(
+            index,
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.easeInOut,
+          );
+        },
       ),
     );
   }
