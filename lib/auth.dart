@@ -49,4 +49,21 @@ class Auth {
   Future<void> signOut() async {
     await _firebaseAuth.signOut();
   }
+
+  Future<Map<String, dynamic>> getUserProfile() async {
+    User? user = _firebaseAuth.currentUser;
+    if (user != null) {
+      DocumentSnapshot userProfile =
+          await _firestore.collection('users').doc(user.uid).get();
+      Map<String, dynamic>? userData =
+          userProfile.data() as Map<String, dynamic>?;
+      return {
+        'email': user.email,
+        'created': user.metadata.creationTime,
+        if (userData != null) ...userData,
+      };
+    } else {
+      throw Exception('Not logged in, please login first');
+    }
+  }
 }

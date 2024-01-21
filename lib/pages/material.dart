@@ -5,6 +5,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mari_bermusik/component/entry_field.dart';
 import 'package:mari_bermusik/component/loading.dart';
 import 'package:mari_bermusik/component/material_card.dart';
+import 'package:mari_bermusik/component/top_navbar.dart';
 import '../auth.dart';
 import 'package:mari_bermusik/services/firestore.dart';
 
@@ -125,7 +126,9 @@ class _MaterialScreenState extends State<MaterialScreen> {
                     contentController.text,
                   );
                 }
-                Navigator.pop(dialogContext);
+                if (mounted) {
+                  Navigator.pop(dialogContext);
+                }
               } catch (e) {
                 print('Failed to add or update material: $e');
               } finally {
@@ -219,7 +222,9 @@ class _MaterialScreenState extends State<MaterialScreen> {
                 setState(() {
                   isLoading.value = false;
                 });
-                Navigator.pop(context);
+                if (mounted) {
+                  Navigator.pop(context);
+                }
               }
             },
             style: ElevatedButton.styleFrom(
@@ -246,28 +251,21 @@ class _MaterialScreenState extends State<MaterialScreen> {
 
   final User? user = Auth().currentUser;
 
-  Widget _title() {
-    return const Text(
-      'Material Page',
-      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: _title(),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => openMaterialBox(),
-        backgroundColor: Colors.blueAccent,
-        tooltip: 'Add Item',
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
-      ),
+      appBar: const TopNavbar(title: 'Material Page'),
+      floatingActionButton: FirebaseAuth.instance.currentUser != null
+          ? FloatingActionButton(
+              onPressed: () => openMaterialBox(),
+              backgroundColor: Colors.blueAccent,
+              tooltip: 'Add Item',
+              child: const Icon(
+                Icons.add,
+                color: Colors.white,
+              ),
+            )
+          : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       bottomNavigationBar: Container(
         height: 70.0,
@@ -325,6 +323,8 @@ class _MaterialScreenState extends State<MaterialScreen> {
                       style: TextStyle(fontSize: 16),
                     ),
                   );
+                } else if (snapshots.hasError) {
+                  return Text('Error: ${snapshots.error}');
                 } else {
                   return const Center(
                     child: Text(

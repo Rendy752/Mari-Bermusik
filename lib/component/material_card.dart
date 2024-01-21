@@ -28,10 +28,10 @@ class MaterialCard extends StatefulWidget {
   });
 
   @override
-  _MaterialCardState createState() => _MaterialCardState();
+  MaterialCardState createState() => MaterialCardState();
 }
 
-class _MaterialCardState extends State<MaterialCard> {
+class MaterialCardState extends State<MaterialCard> {
   final FirestoreServices firestoreServices = FirestoreServices();
   final currentUserId = FirebaseAuth.instance.currentUser?.uid;
   bool isFavorite = false;
@@ -49,9 +49,11 @@ class _MaterialCardState extends State<MaterialCard> {
     if (currentUserId != null) {
       final favoriteStatus =
           await firestoreServices.isMaterialFavorite(currentUserId!, widget.id);
-      setState(() {
-        isFavorite = favoriteStatus;
-      });
+      if (mounted) {
+        setState(() {
+          isFavorite = favoriteStatus;
+        });
+      }
     }
   }
 

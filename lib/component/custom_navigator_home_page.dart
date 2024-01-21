@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:mari_bermusik/component/home_screen.dart';
 import 'package:mari_bermusik/pages/material.dart';
 import 'package:mari_bermusik/pages/login_register.dart';
+import 'package:mari_bermusik/pages/profile_screen.dart';
 
 class CupertinoNavbar extends StatelessWidget {
   const CupertinoNavbar({super.key});
@@ -33,29 +35,24 @@ class CupertinoNavbar extends StatelessWidget {
       tabBuilder: (context, index) {
         switch (index) {
           case 0:
-            return CupertinoTabView(builder: (context) {
-              return CupertinoPageScaffold(
-                child: HomeScreen(),
-              );
-            });
+            return CupertinoTabView(
+              builder: (BuildContext context) => const HomeScreen(),
+            );
           case 1:
-            return CupertinoTabView(builder: (context) {
-              return const CupertinoPageScaffold(
-                child: MaterialScreen(),
-              );
-            });
+            return CupertinoTabView(
+              builder: (BuildContext context) => const MaterialScreen(),
+            );
           case 2:
-            return CupertinoTabView(builder: (context) {
-              return CupertinoPageScaffold(
-                child: LoginRegister(),
-              );
-            });
+            return CupertinoTabView(
+              builder: (BuildContext context) =>
+                  FirebaseAuth.instance.currentUser != null
+                      ? const ProfileScreen()
+                      : const LoginRegister(),
+            );
           default:
-            return CupertinoTabView(builder: (context) {
-              return CupertinoPageScaffold(
-                child: HomeScreen(),
-              );
-            });
+            return CupertinoTabView(
+              builder: (BuildContext context) => const HomeScreen(),
+            );
         }
       },
     );

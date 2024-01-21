@@ -89,4 +89,12 @@ class FirestoreServices {
 
     return querySnapshot.docs.isNotEmpty;
   }
+
+  // get favorite materials length based on user id
+  Future<int> getFavoriteMaterialCount(String userId) async {
+    final querySnapshot =
+        await favoriteMaterials.where('user_id', isEqualTo: userId).get();
+
+    return querySnapshot.docs.length;
+  }
 }

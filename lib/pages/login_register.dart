@@ -3,6 +3,8 @@ import 'package:mari_bermusik/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mari_bermusik/component/entry_field.dart';
 import 'package:mari_bermusik/component/loading.dart';
+import 'package:mari_bermusik/component/top_navbar.dart';
+import 'package:mari_bermusik/pages/profile_screen.dart';
 
 class LoginRegister extends StatefulWidget {
   const LoginRegister({Key? key}) : super(key: key);
@@ -30,14 +32,24 @@ class _LoginRegisterState extends State<LoginRegister> {
         email: _email.text,
         password: _password.text,
       );
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const ProfileScreen()),
+        );
+      }
     } on FirebaseAuthException catch (e) {
-      setState(() {
-        errorMessage = e.message;
-      });
+      if (mounted) {
+        setState(() {
+          errorMessage = e.message;
+        });
+      }
     } finally {
-      setState(() {
-        isLoading.value = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading.value = false;
+        });
+      }
     }
   }
 
@@ -52,6 +64,10 @@ class _LoginRegisterState extends State<LoginRegister> {
         email: _email.text,
         password: _password.text,
       );
+      setState(() {
+        errorMessage = '';
+        isLogin = !isLogin;
+      });
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message;
@@ -74,10 +90,6 @@ class _LoginRegisterState extends State<LoginRegister> {
         }
       },
     );
-  }
-
-  Widget _title() {
-    return Text(isLogin ? 'Login' : 'Register');
   }
 
   Widget _errorMessage() {
@@ -134,9 +146,7 @@ class _LoginRegisterState extends State<LoginRegister> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: _title(),
-      ),
+      appBar: TopNavbar(title: isLogin ? 'Login' : 'Register'),
       body: Stack(
         children: <Widget>[
           Card(
