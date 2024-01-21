@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:mari_bermusik/component/home_screen.dart';
+import 'package:mari_bermusik/pages/home_screen.dart';
 import 'package:mari_bermusik/pages/material.dart';
 import 'package:mari_bermusik/pages/login_register.dart';
 import 'package:mari_bermusik/pages/profile_screen.dart';
