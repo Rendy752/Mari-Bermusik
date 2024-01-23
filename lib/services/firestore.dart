@@ -5,6 +5,8 @@ class FirestoreServices {
       FirebaseFirestore.instance.collection('material');
   final CollectionReference favoriteMaterials =
       FirebaseFirestore.instance.collection('favorite_material');
+  final CollectionReference users =
+      FirebaseFirestore.instance.collection('users');
 
   // add material
   Future<void> addMaterial(String uid, String title, String instrument,
@@ -96,5 +98,21 @@ class FirestoreServices {
         await favoriteMaterials.where('user_id', isEqualTo: userId).get();
 
     return querySnapshot.docs.length;
+  }
+
+  // Edit profile
+  Future<void> updateUserProfile(
+    String userId,
+    Object newName,
+    Object newEmail,
+    Object newUsername,
+    String newFavorite,
+  ) {
+    return users.doc(userId).update({
+      'name': newName,
+      'email': newEmail,
+      'username': newUsername,
+      'favorite': int.parse(newFavorite),
+    });
   }
 }

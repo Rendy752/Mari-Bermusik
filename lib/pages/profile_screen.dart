@@ -1,14 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:mari_bermusik/auth.dart';
 import 'package:flutter/material.dart';
-import 'package:mari_bermusik/component/profile_field.dart';
-import 'package:mari_bermusik/component/top_navbar.dart';
-import 'package:mari_bermusik/pages/login_register.dart';
 import 'package:mari_bermusik/services/firestore.dart';
+import 'package:mari_bermusik/auth.dart';
+import 'package:mari_bermusik/pages/login_register.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  const ProfileScreen({Key? key}) : super(key: key);
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -16,16 +14,26 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
+  final usernameController = TextEditingController();
+  final favoriteController = TextEditingController();
+
   bool isUserLoggedIn() {
     return FirebaseAuth.instance.currentUser != null;
   }
 
-  Key key = UniqueKey();
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    usernameController.dispose();
+    favoriteController.dispose();
+    super.dispose();
+  }
 
   void refresh() {
-    setState(() {
-      key = UniqueKey();
-    });
+    setState(() {});
   }
 
   void signIn() {
@@ -40,18 +48,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
     refresh();
   }
 
+  void saveProfile() async {
+    String newName = nameController.text;
+    String newEmail = emailController.text;
+    String newUsername = usernameController.text;
+    String newFavorite = favoriteController.text;
+
+    await FirestoreServices().updateUserProfile(
+      currentUserId!,
+      newName,
+      newEmail,
+      newUsername,
+      newFavorite,
+    );
+    refresh();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const TopNavbar(title: "Profile Page"),
+      appBar: AppBar(title: const Text("Profile Page")),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => refresh(),
+        onPressed: refresh,
         backgroundColor: Colors.blueAccent,
-        tooltip: 'Refresh',
-        child: const Icon(
-          Icons.refresh,
-          color: Colors.white,
-        ),
+        child: const Icon(Icons.refresh, color: Colors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: SingleChildScrollView(
@@ -62,10 +82,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               width: double.infinity,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    Colors.blue,
-                    Colors.lightBlueAccent
-                  ], // gradient colors
+                  colors: [Colors.blue, Colors.lightBlueAccent],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                 ),
@@ -75,104 +92,61 @@ class _ProfileScreenState extends State<ProfileScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 children: [
-                  Align(
-                    alignment: Alignment.topCenter,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 100),
-                      child: Stack(
-                        alignment: Alignment.bottomRight,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.blue,
-                                  width: 2,
-                                ),
-                                shape: BoxShape.circle),
-                            child: const CircleAvatar(
-                              radius: 50,
-                              backgroundImage:
-                                  AssetImage('assets/images/profile.png'),
-                            ),
-                          ),
-                          if (isUserLoggedIn())
-                            IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                Icons.camera_alt,
-                                color: Colors.blue[100],
-                              ),
-                            ),
-                        ],
-                      ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 100),
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundImage: AssetImage('assets/images/profile.png'),
                     ),
                   ),
                   FutureBuilder<Map<String, dynamic>>(
                     future: Auth().getUserProfile(),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<Map<String, dynamic>> snapshot) {
+                    builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Container(
-                            margin: const EdgeInsets.symmetric(vertical: 20.0),
-                            child: const CircularProgressIndicator());
+                        return const CircularProgressIndicator();
                       } else if (snapshot.hasError) {
-                        return Container(
-                            margin: const EdgeInsets.symmetric(vertical: 20.0),
-                            child: Text('Error ${snapshot.error}',
-                                style: const TextStyle(
-                                    color: Colors.red,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold)));
-                      } else {
+                        return Text('Error: ${snapshot.error}');
+                      } else if (snapshot.hasData) {
                         Map<String, dynamic> userProfile = snapshot.data!;
+                        nameController.text = userProfile['name'];
+                        emailController.text = userProfile['email'];
+                        usernameController.text = userProfile['username'];
+                        favoriteController.text =
+                            userProfile['favorite'].toString();
                         return Column(
                           children: [
-                            Container(
-                              margin:
-                                  const EdgeInsets.symmetric(vertical: 16.0),
-                              child: Center(
-                                child: Text(
-                                  'Joined since ${timeago.format(userProfile['created'])}',
-                                  style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
+                            Text(
+                              'Joined since ${timeago.format(userProfile['created'])}',
                             ),
-                            ProfileField(
-                                fieldName: 'Name',
-                                content: userProfile['name']),
-                            ProfileField(
-                                fieldName: 'Email',
-                                content: userProfile['email']),
-                            ProfileField(
-                                fieldName: 'Username',
-                                content: userProfile['username']),
-                            FutureBuilder<int>(
-                              future: FirestoreServices()
-                                  .getFavoriteMaterialCount(
-                                      FirebaseAuth.instance.currentUser!.uid),
-                              builder: (BuildContext context,
-                                  AsyncSnapshot<int> snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return Container(
-                                      margin: const EdgeInsets.symmetric(
-                                          vertical: 20.0),
-                                      child: const CircularProgressIndicator());
-                                } else if (snapshot.hasError) {
-                                  return Text('Error: ${snapshot.error}');
-                                } else {
-                                  int favoriteCount = snapshot.data!;
-                                  return ProfileField(
-                                    fieldName: 'Favorite',
-                                    content: favoriteCount.toString(),
-                                  );
-                                }
-                              },
+                            TextFormField(
+                              controller: nameController,
+                              decoration:
+                                  const InputDecoration(labelText: 'Name'),
+                            ),
+                            TextFormField(
+                              controller: emailController,
+                              decoration:
+                                  const InputDecoration(labelText: 'Email'),
+                            ),
+                            TextFormField(
+                              controller: usernameController,
+                              decoration:
+                                  const InputDecoration(labelText: 'Username'),
+                            ),
+                            TextFormField(
+                              controller: favoriteController,
+                              decoration:
+                                  const InputDecoration(labelText: 'Favorite'),
+                              keyboardType: TextInputType.number,
+                            ),
+                            ElevatedButton(
+                              onPressed: saveProfile,
+                              child: const Text('Save Profile'),
                             ),
                           ],
                         );
+                      } else {
+                        return const Text('No user profile found.');
                       }
                     },
                   ),
@@ -184,33 +158,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             onPressed: signOut,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.red,
-                              shadowColor: Colors.black,
-                              elevation: 5,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 12),
                             ),
                             child: const Text('Sign Out',
-                                style: TextStyle(
-                                    fontSize: 20, color: Colors.white)),
+                                style: TextStyle(fontSize: 20)),
                           )
                         : ElevatedButton(
                             onPressed: signIn,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.green,
-                              shadowColor: Colors.black,
-                              elevation: 5,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 12),
                             ),
                             child: const Text('Sign In',
-                                style: TextStyle(
-                                    fontSize: 20, color: Colors.white)),
+                                style: TextStyle(fontSize: 20)),
                           ),
                   )
                 ],
