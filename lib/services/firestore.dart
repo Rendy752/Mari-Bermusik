@@ -100,19 +100,30 @@ class FirestoreServices {
     return querySnapshot.docs.length;
   }
 
-  // Edit profile
+  // Update user profile
   Future<void> updateUserProfile(
     String userId,
-    Object newName,
-    Object newEmail,
-    Object newUsername,
-    String newFavorite,
+    String newName,
+    String? email,
+    String? username,
+    int? favorite,
   ) {
-    return users.doc(userId).update({
-      'name': newName,
-      'email': newEmail,
-      'username': newUsername,
-      'favorite': int.parse(newFavorite),
-    });
+    Map<String, dynamic> updates = {};
+    if (newName.isNotEmpty) updates['name'] = newName;
+    if (email != null && email.isNotEmpty) updates['email'] = email;
+    if (username != null && username.isNotEmpty) updates['username'] = username;
+    if (favorite != null) updates['favorite'] = favorite;
+
+    if (updates.isNotEmpty) {
+      return users.doc(userId).update(updates).then((_) {
+        print('User profile updated successfully.');
+      }).catchError((error) {
+        print('Error updating user profile: $error');
+        throw error;
+      });
+    } else {
+      print('No changes to update.');
+      return Future.error('No changes to update.');
+    }
   }
 }

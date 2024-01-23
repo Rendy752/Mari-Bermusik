@@ -9,10 +9,13 @@ class ProfileField extends StatelessWidget {
     return FirebaseAuth.instance.currentUser != null;
   }
 
+  final Function()? onEditNamePressed;
+
   ProfileField({
     super.key,
     required this.fieldName,
     required this.content,
+    this.onEditNamePressed,
   });
 
   IconData getIconBasedOnFieldName(String fieldName) {
@@ -90,7 +93,7 @@ class ProfileField extends StatelessWidget {
             ),
             if (isUserLoggedIn() && fieldName == 'Name')
               IconButton(
-                onPressed: () {},
+                onPressed: onEditNamePressed,
                 icon: const Icon(
                   Icons.edit,
                   color: Colors.blueAccent,

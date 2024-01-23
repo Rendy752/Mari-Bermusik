@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:mari_bermusik/auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mari_bermusik/auth.dart';
 import 'package:mari_bermusik/component/profile_field.dart';
 import 'package:mari_bermusik/component/top_navbar.dart';
 import 'package:mari_bermusik/pages/login_register.dart';
@@ -8,24 +8,24 @@ import 'package:mari_bermusik/services/firestore.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  const ProfileScreen({Key? key}) : super(key: key);
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
+  final usernameController = TextEditingController();
+  final favoriteController = TextEditingController();
+
   bool isUserLoggedIn() {
     return FirebaseAuth.instance.currentUser != null;
   }
 
-  Key key = UniqueKey();
-
   void refresh() {
-    setState(() {
-      key = UniqueKey();
-    });
+    setState(() {});
   }
 
   void signIn() {
@@ -40,12 +40,68 @@ class _ProfileScreenState extends State<ProfileScreen> {
     refresh();
   }
 
+  void changeName() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Change Name'),
+          content: TextField(
+            controller: nameController,
+            decoration: const InputDecoration(hintText: "Enter your new name"),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Save'),
+              onPressed: () {
+                String newName = nameController.text;
+                if (newName.isNotEmpty) {
+                  FirestoreServices()
+                      .updateUserProfile(
+                    FirebaseAuth.instance.currentUser!.uid,
+                    newName,
+                    null,
+                    null,
+                    null,
+                  )
+                      .then((_) {
+                    print('User profile updated successfully.');
+                    Navigator.of(context).pop();
+                    refresh();
+                  }).catchError((error) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Failed to update profile: $error'),
+                      ),
+                    );
+                  });
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Name cannot be empty.'),
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const TopNavbar(title: "Profile Page"),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => refresh(),
+        onPressed: refresh,
         backgroundColor: Colors.blueAccent,
         tooltip: 'Refresh',
         child: const Icon(
@@ -81,25 +137,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         children: [
                           Container(
                             decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.blue,
-                                  width: 2,
-                                ),
-                                shape: BoxShape.circle),
+                              border: Border.all(
+                                color: Colors.blue,
+                                width: 2,
+                              ),
+                              shape: BoxShape.circle,
+                            ),
                             child: const CircleAvatar(
                               radius: 50,
                               backgroundImage:
                                   AssetImage('assets/images/profile.png'),
                             ),
                           ),
-                          if (isUserLoggedIn())
-                            IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                Icons.camera_alt,
-                                color: Colors.blue[100],
-                              ),
-                            ),
                         ],
                       ),
                     ),
@@ -109,39 +158,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     builder: (BuildContext context,
                         AsyncSnapshot<Map<String, dynamic>> snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Container(
-                            margin: const EdgeInsets.symmetric(vertical: 20.0),
-                            child: const CircularProgressIndicator());
+                        return const CircularProgressIndicator();
                       } else if (snapshot.hasError) {
-                        return Container(
-                            margin: const EdgeInsets.symmetric(vertical: 20.0),
-                            child: Text(
-                                snapshot.error
-                                    .toString()
-                                    .replaceFirst('Exception: ', ''),
-                                style: const TextStyle(
-                                    color: Colors.red,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold)));
+                        return Text('Error: ${snapshot.error}',
+                            style: const TextStyle(
+                                color: Colors.red,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold));
                       } else {
                         Map<String, dynamic> userProfile = snapshot.data!;
                         return Column(
                           children: [
-                            Container(
-                              margin:
-                                  const EdgeInsets.symmetric(vertical: 16.0),
-                              child: Center(
-                                child: Text(
-                                  'Joined since ${timeago.format(userProfile['created'])}',
-                                  style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ),
                             ProfileField(
-                                fieldName: 'Name',
-                                content: userProfile['name']),
+                              fieldName: 'Name',
+                              content: userProfile['name'],
+                              onEditNamePressed: changeName,
+                            ),
                             ProfileField(
                                 fieldName: 'Email',
                                 content: userProfile['email']),
@@ -156,18 +188,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   AsyncSnapshot<int> snapshot) {
                                 if (snapshot.connectionState ==
                                     ConnectionState.waiting) {
-                                  return Container(
-                                      margin: const EdgeInsets.symmetric(
-                                          vertical: 20.0),
-                                      child: const CircularProgressIndicator());
+                                  return const CircularProgressIndicator();
                                 } else if (snapshot.hasError) {
                                   return Text('Error: ${snapshot.error}');
                                 } else {
                                   int favoriteCount = snapshot.data!;
                                   return ProfileField(
-                                    fieldName: 'Favorite',
-                                    content: favoriteCount.toString(),
-                                  );
+                                      fieldName: 'Favorite',
+                                      content: favoriteCount.toString());
                                 }
                               },
                             ),
@@ -212,7 +240,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 style: TextStyle(
                                     fontSize: 20, color: Colors.white)),
                           ),
-                  )
+                  ),
                 ],
               ),
             ),
