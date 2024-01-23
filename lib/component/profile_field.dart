@@ -46,9 +46,9 @@ class ProfileField extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             SizedBox(
-              width: MediaQuery.of(context).size.width / 3,
               child: Row(
                 children: [
                   Icon(

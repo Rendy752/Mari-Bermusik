@@ -63,7 +63,7 @@ class Auth {
         if (userData != null) ...userData,
       };
     } else {
-      throw Exception('Not logged in, please login first');
+      throw Exception('User not logged in, please login first');
     }
   }
 }
