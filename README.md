@@ -24,3 +24,5 @@ dart pub global activate flutterfire_cli
 
 flutter pub add firebase_core
 flutter pub add cloud_firestore
+
+### Enjoy your MariBermusik
