@@ -112,7 +112,7 @@ class FirestoreServices {
     if (newName.isNotEmpty) updates['name'] = newName;
     if (email != null && email.isNotEmpty) updates['email'] = email;
     if (username != null && username.isNotEmpty) updates['username'] = username;
-    if (favorite != null) updates['favorite'] = favorite;
+    // if (favorite != null) updates['favorite'] = favorite;
 
     if (updates.isNotEmpty) {
       return users.doc(userId).update(updates).then((_) {

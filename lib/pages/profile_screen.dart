@@ -5,7 +5,7 @@ import 'package:mari_bermusik/component/profile_field.dart';
 import 'package:mari_bermusik/component/top_navbar.dart';
 import 'package:mari_bermusik/pages/login_register.dart';
 import 'package:mari_bermusik/services/firestore.dart';
-import 'package:timeago/timeago.dart' as timeago;
+// import 'package:timeago/timeago.dart' as timeago;
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -45,20 +45,54 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Change Name'),
-          content: TextField(
-            controller: nameController,
-            decoration: const InputDecoration(hintText: "Enter your new name"),
+          backgroundColor: Colors.grey[200],
+          title: const Text(
+            'Change Name',
+            style: const TextStyle(
+              color: Colors.blueAccent,
+              fontWeight: FontWeight.bold,
+              fontSize: 24,
+              fontFamily: 'Arial',
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: nameController,
+                decoration: InputDecoration(
+                    hintText: "Enter your new name",
+                    labelText: "New Name",
+                    prefixIcon: Icon(Icons.drive_file_rename_outline_sharp,
+                        color: Colors.grey),
+                    labelStyle: TextStyle(
+                      color: Colors.grey[700], //
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blueAccent),
+                    )),
+              ),
+            ],
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancel'),
+              child: const Text('Cancel',
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontFamily: 'Arial',
+                      fontWeight: FontWeight.bold)),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
-            TextButton(
-              child: const Text('Save'),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                primary: Colors.blue,
+                onPrimary: Colors.white,
+              ),
               onPressed: () {
                 String newName = nameController.text;
                 if (newName.isNotEmpty) {
@@ -89,6 +123,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   );
                 }
               },
+              child: const Text('Save',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Arial',
+                      fontWeight: FontWeight.bold)),
             ),
           ],
         );
