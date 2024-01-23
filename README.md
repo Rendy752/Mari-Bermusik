@@ -1,6 +1,6 @@
-## How To Run MariBermusik (Flutter)
+# How To Run MariBermusik (Flutter)
 
-# Installation
+## Installation
 
 1. Clone Repository
 
@@ -10,7 +10,7 @@ https://github.com/Rendy752/Mari-Bermusik.git
 
 flutter pub get
 
-# Firebase Setup
+## Firebase Setup
 
 1. Install Firebase Tools:
 
