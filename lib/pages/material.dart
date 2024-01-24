@@ -284,7 +284,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
         child: Stack(
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: StreamBuilder<QuerySnapshot>(
                 stream: firestoreServices.getMaterials(),
                 builder: (context, snapshots) {
@@ -313,6 +313,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
                         String description = data['description'];
                         String sub = data['sub'];
                         String content = data['content'];
+                        Timestamp updatedAt = data['updated_at'];
 
                         return MaterialCard(
                             id: id,
@@ -322,6 +323,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
                             description: description,
                             sub: sub,
                             content: content,
+                            updatedAt: updatedAt,
                             openMaterialBoxCallback: openMaterialBox,
                             openDeleteConfirmationBoxCallback:
                                 openDeleteConfirmationBox);

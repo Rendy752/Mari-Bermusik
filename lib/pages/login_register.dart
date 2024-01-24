@@ -188,7 +188,7 @@ class _LoginRegisterState extends State<LoginRegister> {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.white.withOpacity(0.8),
-          padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
           ),
@@ -204,7 +204,7 @@ class _LoginRegisterState extends State<LoginRegister> {
               ? 'Don\'t have an account ? Register'
               : 'Already have an account ? Login',
           style: const TextStyle(
-            fontSize: 20,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
             color: Colors.black,
             shadows: <Shadow>[

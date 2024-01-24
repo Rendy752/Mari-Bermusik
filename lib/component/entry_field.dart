@@ -98,6 +98,17 @@ class EntryFieldState extends State<EntryField> {
             color: Colors.black87,
           ),
           obscureText: widget.title == 'Password' ? _obscureText : false,
+          maxLines: (widget.title == 'Description' || widget.title == 'Content')
+              ? null
+              : 1,
+          keyboardType:
+              (widget.title == 'Description' || widget.title == 'Content')
+                  ? TextInputType.multiline
+                  : TextInputType.text,
+          textInputAction:
+              (widget.title == 'Description' || widget.title == 'Content')
+                  ? TextInputAction.newline
+                  : TextInputAction.next,
           decoration: InputDecoration(
             prefixIcon: Icon(
               widget.title == 'Email'

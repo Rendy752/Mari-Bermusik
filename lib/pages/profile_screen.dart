@@ -5,6 +5,7 @@ import 'package:mari_bermusik/component/profile_field.dart';
 import 'package:mari_bermusik/component/top_navbar.dart';
 import 'package:mari_bermusik/pages/login_register.dart';
 import 'package:mari_bermusik/services/firestore.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -233,6 +234,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Map<String, dynamic> userProfile = snapshot.data!;
                         return Column(
                           children: [
+                            Container(
+                              margin:
+                                  const EdgeInsets.symmetric(vertical: 16.0),
+                              child: Center(
+                                child: Text(
+                                  'Joined since ${timeago.format(userProfile['created'])}',
+                                  style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
                             ProfileField(
                               fieldName: 'Name',
                               content: userProfile['name'],
