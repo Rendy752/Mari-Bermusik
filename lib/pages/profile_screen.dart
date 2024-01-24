@@ -5,7 +5,6 @@ import 'package:mari_bermusik/component/profile_field.dart';
 import 'package:mari_bermusik/component/top_navbar.dart';
 import 'package:mari_bermusik/pages/login_register.dart';
 import 'package:mari_bermusik/services/firestore.dart';
-// import 'package:timeago/timeago.dart' as timeago;
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -40,7 +39,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     refresh();
   }
 
-  void changeName() {
+  void changeName(String defaultName) {
+    TextEditingController nameController =
+        TextEditingController(text: defaultName);
     showDialog(
       context: context,
       builder: (context) {
@@ -48,7 +49,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           backgroundColor: Colors.grey[200],
           title: const Text(
             'Change Name',
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.blueAccent,
               fontWeight: FontWeight.bold,
               fontSize: 24,
@@ -63,15 +64,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 decoration: InputDecoration(
                     hintText: "Enter your new name",
                     labelText: "New Name",
-                    prefixIcon: Icon(Icons.drive_file_rename_outline_sharp,
+                    prefixIcon: const Icon(
+                        Icons.drive_file_rename_outline_sharp,
                         color: Colors.grey),
                     labelStyle: TextStyle(
-                      color: Colors.grey[700], //
+                      color: Colors.grey[700],
                     ),
-                    enabledBorder: OutlineInputBorder(
+                    enabledBorder: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.black),
                     ),
-                    focusedBorder: OutlineInputBorder(
+                    focusedBorder: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.blueAccent),
                     )),
               ),
@@ -90,8 +92,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                primary: Colors.blue,
-                onPrimary: Colors.white,
+                backgroundColor: Colors.blue,
               ),
               onPressed: () {
                 String newName = nameController.text;
@@ -117,8 +118,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   });
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text('Name cannot be empty.'),
+                    const SnackBar(
+                      content: Text('Name cannot be empty.'),
                     ),
                   );
                 }
@@ -197,13 +198,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     builder: (BuildContext context,
                         AsyncSnapshot<Map<String, dynamic>> snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
+                        return Container(
+                            margin: const EdgeInsets.only(top: 20.0),
+                            child: const CircularProgressIndicator());
                       } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}',
+                        return Container(
+                          padding: const EdgeInsets.all(16.0),
+                          margin: const EdgeInsets.only(top: 20.0),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 5,
+                                blurRadius: 7,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            snapshot.error
+                                .toString()
+                                .replaceFirst('Exception:', ''),
                             style: const TextStyle(
-                                color: Colors.red,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold));
+                              color: Colors.red,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        );
                       } else {
                         Map<String, dynamic> userProfile = snapshot.data!;
                         return Column(
@@ -211,7 +236,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ProfileField(
                               fieldName: 'Name',
                               content: userProfile['name'],
-                              onEditNamePressed: changeName,
+                              onEditNamePressed: () =>
+                                  changeName(userProfile['name']),
                             ),
                             ProfileField(
                                 fieldName: 'Email',
@@ -227,7 +253,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   AsyncSnapshot<int> snapshot) {
                                 if (snapshot.connectionState ==
                                     ConnectionState.waiting) {
-                                  return const CircularProgressIndicator();
+                                  return Container(
+                                      margin: const EdgeInsets.only(top: 20.0),
+                                      child: const CircularProgressIndicator());
                                 } else if (snapshot.hasError) {
                                   return Text('Error: ${snapshot.error}');
                                 } else {

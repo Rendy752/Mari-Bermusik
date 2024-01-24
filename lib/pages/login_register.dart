@@ -237,6 +237,8 @@ class _LoginRegisterState extends State<LoginRegister> {
           image: AssetImage(
               'assets/images/${images[Random().nextInt(images.length)]}.jpg'),
           fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(
+              Colors.black.withOpacity(0.8), BlendMode.dstATop),
         ),
       ),
     );

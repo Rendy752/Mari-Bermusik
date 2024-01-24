@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -9,14 +10,175 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       home: HomeScreen(),
     );
   }
 }
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  HomeScreen({super.key});
+
+  final List<String> images = [
+    "assets/images/musicalInstrument.jpg",
+    "assets/images/clarinet1.jpg",
+    "assets/images/clarinet2.jpg",
+    "assets/images/drums1.jpg",
+    "assets/images/drums2.jpg",
+    "assets/images/flute1.jpg",
+    "assets/images/flute2.jpg",
+    "assets/images/guitar1.jpg",
+    "assets/images/guitar2.jpg",
+    "assets/images/piano1.jpg",
+    "assets/images/piano2.jpg",
+    "assets/images/violin1.jpg",
+    "assets/images/violin2.jpg",
+  ];
+
+  Widget _header() {
+    return SizedBox(
+      height: 110,
+      child: ClipPath(
+        clipper: HeaderClipper(),
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Colors.blue, Colors.lightBlueAccent],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 5,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: RichText(
+                    textAlign: TextAlign.start,
+                    text: const TextSpan(
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                        shadows: [
+                          Shadow(
+                            offset: Offset(1.0, 1.0),
+                            blurRadius: 2.0,
+                            color: Color.fromARGB(255, 0, 0, 0),
+                          ),
+                        ],
+                      ),
+                      children: [
+                        TextSpan(
+                          text: "Stay ",
+                          style: TextStyle(fontFamily: 'Arial'),
+                        ),
+                        TextSpan(
+                          text: "Hungry",
+                          style: TextStyle(
+                              color: Colors.green,
+                              decoration: TextDecoration.underline),
+                        ),
+                        TextSpan(
+                          text: " Stay ",
+                          style: TextStyle(fontFamily: 'Arial'),
+                        ),
+                        TextSpan(
+                          text: "Foolish",
+                          style: TextStyle(
+                              color: Colors.green,
+                              decoration: TextDecoration.underline),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _title(String name) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ShaderMask(
+        shaderCallback: (bounds) => const LinearGradient(
+          colors: [Colors.blue, Colors.purple],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ).createShader(bounds),
+        child: Text(
+          name,
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontFamily: 'Arial',
+            shadows: [
+              Shadow(
+                offset: Offset(2.0, 2.0),
+                blurRadius: 3.0,
+                color: Color.fromARGB(255, 0, 0, 0),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _instrumentCarousel() {
+    return CarouselSlider(
+      options: CarouselOptions(
+        height: 400.0,
+        enlargeCenterPage: true,
+        autoPlay: true,
+        aspectRatio: 2.0,
+        autoPlayCurve: Curves.fastOutSlowIn,
+        enableInfiniteScroll: true,
+        autoPlayAnimationDuration: const Duration(milliseconds: 500),
+        viewportFraction: 0.8,
+      ),
+      items: images.map((item) {
+        return Builder(
+          builder: (BuildContext context) {
+            return Container(
+              width: MediaQuery.of(context).size.width,
+              margin: const EdgeInsets.symmetric(horizontal: 5.0),
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(10.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10.0),
+                child: Image.asset(item, fit: BoxFit.cover),
+              ),
+            );
+          },
+        );
+      }).toList(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,151 +186,10 @@ class HomeScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Header
-            SizedBox(
-              height: 110, // Ubah tinggi header menjadi 120
-              child: ClipPath(
-                clipper: HeaderClipper(),
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: const Color.fromRGBO(218, 192, 163, 1),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 5,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.start, // Pindahkan ke sebelah kanan
-                    children: [
-                      Expanded(
-                        child: RichText(
-                          textAlign: TextAlign.start, // Teks diatur ke kanan
-                          text: const TextSpan(
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            children: [
-                              TextSpan(
-                                text: "Stay ",
-                                style: TextStyle(color: Colors.black),
-                              ),
-                              TextSpan(
-                                text: "Hungry ",
-                                style: TextStyle(color: Colors.green),
-                              ),
-                              TextSpan(
-                                text: "Stay ",
-                                style: TextStyle(color: Colors.black),
-                              ),
-                              TextSpan(
-                                text: "Foolish",
-                                style: TextStyle(color: Colors.green),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            // Judul Courses
-            const Padding(
-              padding: EdgeInsets.all(20.0),
-              child: Text(
-                "Courses",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            // Gambar di tengah dengan rasio 9:16
-            Container(
-              width: double.infinity,
-              height: 500,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/guitar1.jpg'),
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
+            _header(),
+            _title("Musical Instruments"),
+            _instrumentCarousel(),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class BottomNavbar extends StatefulWidget {
-  const BottomNavbar({super.key});
-
-  @override
-  BottomNavBarState createState() => BottomNavBarState();
-}
-
-class BottomNavBarState extends State<BottomNavbar> {
-  int selectedIndex = 0;
-  List<IconData> data = [
-    Icons.home,
-    Icons.mark_chat_unread_outlined,
-    Icons.menu_book_outlined,
-    Icons.notifications_none,
-    Icons.person_pin_circle_outlined,
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      elevation: 10,
-      color: Colors.white,
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(width: 2.0, color: Colors.grey.shade500),
-          ),
-        ),
-        height: 70,
-        width: double.infinity,
-        child: ListView.builder(
-          itemCount: data.length,
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          itemBuilder: (ctx, i) => Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
-            child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  selectedIndex = i;
-                });
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 280),
-                width: 40,
-                decoration: BoxDecoration(
-                  border: i == selectedIndex
-                      ? const Border(
-                          top: BorderSide(width: 2.0, color: Colors.blue),
-                        )
-                      : null,
-                ),
-                child: Icon(
-                  data[i],
-                  size: 35,
-                  color:
-                      i == selectedIndex ? Colors.blue : Colors.grey.shade800,
-                ),
-              ),
-            ),
-          ),
-          scrollDirection: Axis.horizontal,
         ),
       ),
     );

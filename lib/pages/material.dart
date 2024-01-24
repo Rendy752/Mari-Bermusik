@@ -273,10 +273,12 @@ class _MaterialScreenState extends State<MaterialScreen> {
           : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/images/musicalInstrument.jpg"),
+            image: const AssetImage("assets/images/musicalInstrument.jpg"),
             fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+                Colors.black.withOpacity(0.8), BlendMode.dstATop),
           ),
         ),
         child: Stack(

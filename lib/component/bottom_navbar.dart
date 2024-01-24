@@ -14,7 +14,7 @@ class _BottomNavbarState extends State<BottomNavbar> {
   int _currentIndex = 0;
   final _pageController = PageController();
   final List<Widget> _pages = [
-    const HomeScreen(),
+    HomeScreen(),
     const MaterialScreen(),
     const ProfileScreen()
   ];
@@ -55,7 +55,7 @@ class _BottomNavbarState extends State<BottomNavbar> {
             ),
             activeIcon: Icon(Icons.book, size: 35.0),
             label: 'Material',
-            backgroundColor: Colors.green,
+            backgroundColor: Colors.blue,
           ),
           BottomNavigationBarItem(
             icon: Icon(
@@ -64,7 +64,7 @@ class _BottomNavbarState extends State<BottomNavbar> {
             ),
             activeIcon: Icon(Icons.person, size: 35.0),
             label: 'Profile',
-            backgroundColor: Colors.purple,
+            backgroundColor: Colors.blue,
           ),
         ],
         onTap: (index) {
