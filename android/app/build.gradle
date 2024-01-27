@@ -19,6 +19,16 @@ if (flutterRoot == null) {
     throw new RuntimeException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
 }
 
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('../key.properties')
+println "key.properties file: " + keystorePropertiesFile.getAbsolutePath()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+    println "storeFile: " + keystoreProperties['storeFile']
+}  else {
+    println "keystorePropertiesFile does not exist"
+}
+
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 apply plugin: 'kotlin-android'
 
@@ -61,11 +71,28 @@ android {
         versionName flutterVersionName
     }
 
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            def versionName = variant.versionName
+            def versionCode = variant.versionCode
+            def variantName = variant.name
+            // outputFileName = "${variantName}-MariBermusik-v${versionName}-${versionCode}.apk"
+            outputFileName = "MariBermusik-v${versionName}-${versionCode}.apk"
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
         }
     }
 }
