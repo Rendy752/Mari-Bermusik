@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:card_swiper/card_swiper.dart';
 
 void main() {
   runApp(const MyApp());
@@ -140,43 +140,33 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _instrumentCarousel() {
-    return CarouselSlider(
-      options: CarouselOptions(
-        height: 400.0,
-        enlargeCenterPage: true,
-        autoPlay: true,
-        aspectRatio: 2.0,
-        autoPlayCurve: Curves.fastOutSlowIn,
-        enableInfiniteScroll: true,
-        autoPlayAnimationDuration: const Duration(milliseconds: 500),
+    return SizedBox(
+      height: 400.0,
+      child: Swiper(
+        itemCount: images.length,
+        itemBuilder: (context, index) {
+          return Container(
+            margin: const EdgeInsets.symmetric(horizontal: 5.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10.0),
+              child: Image.asset(images[index], fit: BoxFit.cover),
+            ),
+          );
+        },
         viewportFraction: 0.8,
+        scale: 0.9,
       ),
-      items: images.map((item) {
-        return Builder(
-          builder: (BuildContext context) {
-            return Container(
-              width: MediaQuery.of(context).size.width,
-              margin: const EdgeInsets.symmetric(horizontal: 5.0),
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(10.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 5,
-                    blurRadius: 7,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10.0),
-                child: Image.asset(item, fit: BoxFit.cover),
-              ),
-            );
-          },
-        );
-      }).toList(),
     );
   }
 
